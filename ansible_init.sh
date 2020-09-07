@@ -86,19 +86,19 @@ fi
 
 #下载docker ansible安装包
 
-echo -e  "\033[31m镜像本地存放路径:$current_path/$images_tmp\033[0m"
+#echo -e  "\033[31m镜像本地存放路径:$current_path/$images_tmp\033[0m"
         wget $docker_bag  -P  $current_path/$images_tmp &> /dev/null
         if [ $? != 0 ];then
                 echo -e  "\033[31m$docker_bag下载失败，请手动下载。\033[0m"   
-        else
-                echo -e  "\033[32m$docker_bag已经完成下载。\033[0m"       
+#        else
+#                echo -e  "\033[32m$docker_bag已经完成下载。\033[0m"       
         fi
 
         wget $ansible_bag  -P  $current_path/$images_tmp &> /dev/null
         if [ $? != 0 ];then
                 echo -e  "\033[31m$ansible_bag下载失败，请手动下载。\033[0m"   
-        else
-                echo -e  "\033[32m$ansible_bag已经完成下载。\033[0m"       
+#        else
+#                echo -e  "\033[32m$ansible_bag已经完成下载。\033[0m"       
         fi
 
 
@@ -139,7 +139,7 @@ ssh -p $ansible_port root@$ansible_ip "mkdir -p $IMAGE_FILE"
 
 #将本地的tar包导入ansible master主机
 
-echo -e  "\033[31m开始传输镜像到$ansible_ip(ansible)的$IMAGE_FILE目录。\033[0m"
+#echo -e  "\033[31m开始传输镜像到$ansible_ip(ansible)的$IMAGE_FILE目录。\033[0m"
 for i in `ls $current_path/$images_tmp`
 do
 #判断镜像包是否存在
@@ -152,8 +152,8 @@ do
 
         if [ $? != 0 ];then
                 echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
-        else
-                echo -e "\033[32m$i传输成功。\033[0m"
+#        else
+#                echo -e "\033[32m$i传输成功。\033[0m"
 
 fi
 done
