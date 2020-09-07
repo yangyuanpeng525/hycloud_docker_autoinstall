@@ -96,6 +96,7 @@ if [ ! -f $current_path/$images_list  ];then
 	exit 3
 fi
 
+echo -e  "\033[32m-----------------下载开始-----------------------\033[0m"
 #下载docker ansible安装包
         wget $docker_bag  -P  $current_path/$images_tmp &> /dev/null
         if [ $? != 0 ];then
@@ -117,7 +118,7 @@ do
 	if [ $? != 0 ];then
 		echo -e  "\033[31m$ckm_bag下载失败，请手动下载。\033[0m"   
 	else 
-		echo -e  "\033[32m$i$suffix已经完成下载。\033[0m"	
+		echo -e  "\033[32m$prefix$i$suffix已经完成下载。\033[0m"	
 	fi
 done
 
@@ -162,26 +163,24 @@ do
         sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_trs_FILE  &> /dev/null
 	        if [ $? != 0 ];then
         	        echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
-                	continue
         	else
                 	echo -e "\033[32m$i传输成功。\033[0m"
 #解压trs应用
-	sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_trs_FILE;tar -zxf $i"
-
+			sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_trs_FILE;tar -zxf $i"
 		fi
+	continue
 	fi
 ##hy应用
         if [ "$i" = "$prefix$iip_bag$suffix" ] || [ "$i" = "$prefix$igi_bag$suffix" ]  || [ "$i" = "$prefix$igs_bag$suffix" ]  || [ "$i" = "$prefix$ipm_bag$suffix" ] || [ "$i" = "$prefix$weibo_bag$suffix" ];then
         sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_hy_FILE  &> /dev/null
                 if [ $? != 0 ];then
                         echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
-                        continue
                 else
                         echo -e "\033[32m$i传输成功。\033[0m"
 #解压hy应用
-        sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_hy_FILE;tar -zxf $i"
-
+        		sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_hy_FILE;tar -zxf $i"
                 fi
+	continue
         fi
 
 #基础应用
@@ -194,7 +193,7 @@ do
         	echo -e "\033[32m$i传输成功。\033[0m"
 
 #解压
-sshpass  -p "$ansible_pass"	ssh -p $ansible_port root@$ansible_ip "cd $SOFT_base_FILE;tar -zxf $i"
+	sshpass  -p "$ansible_pass"	ssh -p $ansible_port root@$ansible_ip "cd $SOFT_base_FILE;tar -zxf $i"
 
 fi
 done
