@@ -4,25 +4,25 @@
 
 #软件或应用名称
 #第三方软件
-install_es
-install_logstash
-install_mariadb
-install_nginx
-install_rabbitmq
-install_redis
-install_docker #必装
+es
+logstash
+mariadb
+nginx
+rabbitmq
+redis
+docker #必装
 
 
 #TRS应用
-#ids
+ids
 #ckm
-#mas
+mas
 #wechat
 #weibo
 
 #海云应用
-#iip
+iip
 #igi
-#igs
+igs
 #ipm
 
