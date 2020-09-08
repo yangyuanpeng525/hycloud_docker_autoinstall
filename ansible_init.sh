@@ -12,6 +12,9 @@ images_list="install_hy_list.txt"
 #定义安装ansible tool的脚本
 script_ansible_tool="ansibletool_install.sh"
 
+#定义合并ansibel目录的脚本
+integration_sh="integration.sh"
+
 #定义安装ansible tool的安装结果文件
 script_ansible_tool_result="install_ansible_tool_result.txt"
 
@@ -22,11 +25,8 @@ images_tmp="tmp-images"
 #定义ansible master主机镜像存放路径
 SOFT_FILE="/TRS/ansible-hy"
 SOFT_base_FILE="/TRS/ansible-hy/AutoInstall"
-SOFT_base_role_FILE="/TRS/ansible-hy/AutoInstall/roles"
 SOFT_hy_FILE="/TRS/ansible-hy/hyapp"
-SOFT_hy_role_FILE="/TRS/ansible-hy/hyapp/roles"
 SOFT_trs_FILE="/TRS/ansible-hy/trsapp"
-SOFT_trs_role_FILE="/TRS/ansible-hy/trsapp/roles"
 IMAGE_FILE="/TRS/ansible-hy/images-hy"
 
 #定义ansible包前后缀
@@ -127,7 +127,7 @@ echo -e  "\033[32m-----------------下载开始-----------------------\033[0m"
 
 #下载ansible的tar.gz文件
 
-echo -e  "\033[31mansible自动化安装包本地存放路径:$current_path/$file_tmp\033[0m"
+echo -e  "\033[31mansible自动化安装包本地存放路径:$current_path/$file_tmp。\033[0m"
 for i in `cat $current_path/$images_list  | grep  -v "#"`	
 do
 	wget $wget_url$prefix$i$suffix -P  $current_path/$file_tmp  &> /dev/null
@@ -154,13 +154,10 @@ do
 done
 
 #创建ansible master主机ansible包tar.gz存放目录
-sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_base_role_FILE"
-sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_trs_role_FILE"
-sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_hy_role_FILE"
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_base_FILE"
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_trs_FILE"
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_hy_FILE"
 sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $IMAGE_FILE"
-#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_base_role_FILE"
-#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_trs_role_FILE"
-#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_hy_role_FILE"
 
 #将本地的tar包导入ansible master主机
 for i in `ls $current_path/$images_tmp`
@@ -194,31 +191,31 @@ do
 #区分应用分类
 #trs应用
         if [ "$i" = "$prefix$ids_bag$suffix" ] || [ "$i" = "$prefix$ckm_bag$suffix" ]  || [ "$i" = "$prefix$mas_bag$suffix" ]  || [ "$i" = "$prefix$wechat_bag$suffix" ] || [ "$i" = "$prefix$weibo_bag$suffix" ];then
-        sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_trs_role_FILE  &> /dev/null
+        sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_trs_FILE  &> /dev/null
 	        if [ $? != 0 ];then
         	        echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
         	else
                 	echo -e "\033[32m$i传输成功。\033[0m"
 #解压trs应用
-			sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_trs_role_FILE;tar -zxf $i"
+			sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_trs_FILE; tar -zxf $i; rm -rf $i"
 		fi
 	continue
 	fi
 ##hy应用
         if [ "$i" = "$prefix$iip_bag$suffix" ] || [ "$i" = "$prefix$igi_bag$suffix" ]  || [ "$i" = "$prefix$igs_bag$suffix" ]  || [ "$i" = "$prefix$ipm_bag$suffix" ];then
-        sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_hy_role_FILE  &> /dev/null
+        sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_hy_FILE  &> /dev/null
                 if [ $? != 0 ];then
                         echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
                 else
                         echo -e "\033[32m$i传输成功。\033[0m"
 #解压hy应用
-        		sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_hy_role_FILE;tar -zxf $i"
+        		sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_hy_FILE;tar -zxf $i; rm -rf $i"
                 fi
 	continue
         fi
 
 #基础应用
-	sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_base_role_FILE  &> /dev/null
+	sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_base_FILE  &> /dev/null
 
 	if [ $? != 0 ];then
 		echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
@@ -227,10 +224,23 @@ do
         	echo -e "\033[32m$i传输成功。\033[0m"
 
 #解压
-	sshpass  -p "$ansible_pass"	ssh -p $ansible_port root@$ansible_ip "cd $SOFT_base_role_FILE;tar -zxf $i"
+	sshpass  -p "$ansible_pass"	ssh -p $ansible_port root@$ansible_ip "cd $SOFT_base_FILE;tar -zxf $i; rm -rf $i"
 
 fi
 done
+
+#整合目录
+#trs
+#sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_trs_FILE &&  ls | grep install > $SOFT_trs_FILE/trs.txt &&  for i in `cat $SOFT_trs_FILE/trs.txt`;  do  /bin/cp -rf  $i/* .; done"
+#
+##hy
+#sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_hy_FILE && ls | grep install > $SOFT_hy_FILE/hy.txt &&  for i in `cat $SOFT_hy_FILE/hy.txt`; do  /bin/cp -rf  $i/* .; done"
+#
+##基础
+#sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "cd $SOFT_base_FILE && ls | grep install > $SOFT_base_FILE/base.txt &&  for i in `cat $SOFT_base_FILE/base.txt` ; do  /bin/cp -rf  $i/* .; done"
+#
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$integration_sh   root@$ansible_ip:/tmp
+sshpass  -p "$ansible_pass"     ssh -p $ansible_port root@$ansible_ip "bash /tmp/$integration_sh"
 
 #传输基础main.yml
 	if [ -f $current_path/$base_yml ];then
