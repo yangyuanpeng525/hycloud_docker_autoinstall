@@ -5,24 +5,36 @@
 #软件或应用名称
 #第三方软件
 elasticsearch
+#elasticsearch-cluster
 logstash
+#mariadb-pxc
 mariadb
 nginx
+#nginx-cluster
 rabbitmq
+#rabbitmq-cluster
 redis
+#redis-sentinel
+#redis-cluster
 docker #必装
 
 
 #TRS应用
 ids
+#ids-cluster
 #ckm
 mas
+#mas-cluster
 #wechat
 #weibo
 
 #海云应用
 iip
+#iip-cluster
 #igi
+#igi-cluster
 igs
+#igs-cluster
 #ipm
+#ipm-cluster
 
