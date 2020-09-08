@@ -4,7 +4,7 @@
 
 #软件或应用名称
 #第三方软件
-es
+elasticsearch
 logstash
 mariadb
 nginx
