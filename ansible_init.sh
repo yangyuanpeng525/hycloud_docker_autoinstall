@@ -46,6 +46,19 @@ igi_bag="igi"
 igs_bag="igs"
 ipm_bag="ipm"
 
+#定义第三方应用 trs应用 海云应用的三个main.yml
+base_yml="base.yml"
+trs_yml="trs.yml"
+hy_yml="hy.yml"
+
+#定义main.yml生成函数
+main_yml(){
+tee <<EOF
+- name: import $1
+  import_playbook: $1.yml
+EOF
+}
+
 #-------------------------------开始----------------------------------------------------
 read -p "请输入ansible master主机的IP:"  ansible_ip
 read -p "请输入ansible master主机的ssh端口:"  ansible_port
@@ -120,6 +133,21 @@ do
 	else 
 		echo -e  "\033[32m$prefix$i$suffix已经完成下载。\033[0m"	
 	fi
+
+#生成main.yml文件
+#trs
+	if [ "$i" = "ids" ] || [ "$i" = "ckm" ]  || [ "$i" = "mas" ]  || [ "$i" = "wechat" ] || [ "$i" = "weibo" ];then
+		main_yml $i >> $current_path/$trs_yml	
+		continue	
+
+	fi
+
+#hy
+        if [ "$i" = "iip" ] || [ "$i" = "igi" ]  || [ "$i" = "igs" ]  || [ "$i" = "ipm" ];then
+		main_yml $i >> $current_path/$hy_yml
+		continue
+	fi
+	main_yml $i >> $current_path/$base_yml
 done
 
 #创建ansible master主机ansible包tar.gz存放目录
@@ -171,7 +199,7 @@ do
 	continue
 	fi
 ##hy应用
-        if [ "$i" = "$prefix$iip_bag$suffix" ] || [ "$i" = "$prefix$igi_bag$suffix" ]  || [ "$i" = "$prefix$igs_bag$suffix" ]  || [ "$i" = "$prefix$ipm_bag$suffix" ] || [ "$i" = "$prefix$weibo_bag$suffix" ];then
+        if [ "$i" = "$prefix$iip_bag$suffix" ] || [ "$i" = "$prefix$igi_bag$suffix" ]  || [ "$i" = "$prefix$igs_bag$suffix" ]  || [ "$i" = "$prefix$ipm_bag$suffix" ];then
         sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$file_tmp/$i   root@$ansible_ip:$SOFT_hy_FILE  &> /dev/null
                 if [ $? != 0 ];then
                         echo -e "\033[31m$i传输失败，请手动下载！\033[0m"
@@ -198,6 +226,21 @@ do
 fi
 done
 
+#传输基础main.yml
+	if [ -f $current_path/$base_yml ];then
+		sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$base_yml   root@$ansible_ip:$SOFT_base_FILE/main.yml
+		rm -rf $current_path/$base_yml
+	fi
+#传输trs main.yml
+	if [ -f $current_path/$trs_yml ];then
+		sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$trs_yml   root@$ansible_ip:$SOFT_trs_FILE/main.yml
+		rm -rf $current_path/$trs_yml
+	fi
+#传输hy main.yml
+	if [ -f $current_path/$hy_yml ];then
+		sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$hy_yml   root@$ansible_ip:$SOFT_hy_FILE/main.yml
+		rm -rf $current_path/$hy_yml
+	fi
 
 #为ansible主机安装ansible工具
 sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$script_ansible_tool   root@$ansible_ip:/tmp  &> /dev/null
