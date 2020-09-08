@@ -17,9 +17,9 @@
 	功能四：将本机当前路径下的tmp-*中的ansible自动化工具传输到ansible master主机的制定目录--/TRS/ansible-hy,并将单个应用分组整合，一共分为三组：基础、TRS应用、海云应用，并自动生成mail.yml，支持一键部署当前组内的全部应用。
 
 
-2、ansibletool_install.sh   --检测并安装ansible。
+2、ansibletool_install.sh（不需要执行）  --检测并安装ansible。
 
-3、integration.sh  --整合并分组单个应用的ansible安装工具，支持一键部署。
+3、integration.sh（不需要执行）  --整合并分组单个应用的ansible安装工具，支持一键部署。
 
 ***注意***
 inventory  文件需要先填写《海云V8.0精简版部署信息表.xls》/《海云V8.0标准版部署信息表.xls》后，使用研发中心提供的excel-tool-0.0.1-SNAPSHOT.jar工具自动生成ansible需要的inventory文件
