@@ -1,0 +1,6 @@
+#定义下载地址
+url http://d.devdemo.trs.net.cn/hy/devops-hy
+
+#定义ansible master主机镜像存放路径
+SOFT_FILE /TRS/ansible-hy
+#
