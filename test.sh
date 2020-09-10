@@ -135,18 +135,24 @@ cat $current_path/$inventory  | grep -v "#" | grep "\[" | grep  -v ":"  |  awk -
 install_num=`cat $inventory_list | wc -l`
 
 #更新本次安装的版本记录文件
-> $current_path/$install_version
+#> $current_path/$install_version
 
+#检测是否存在install_version准备好的安装版本
+if [ -f $current_path/$install_version ];then
+	echo "检测到自定义安装的版本号"
+
+else
 #将inventory中提取出的组名与最新版本号记录文件中的记录进行匹配，未找到提示跳过安装
-for i in `seq $install_num`
-do 
-	appname=`cat $current_path/$inventory_list |  awk  "NR==$i {print}"`
-	cat $current_path/$latest_version |grep -v "#" | grep $appname: >> $current_path/$install_version
-if [ $? != 0 ];then 
-	echo -e "未找到\t$appname    的最新版本号，跳过安装。"
-	continue
+	for i in `seq $install_num`
+	do 
+		appname=`cat $current_path/$inventory_list |  awk  "NR==$i {print}"`
+		cat $current_path/$latest_version |grep -v "#" | grep $appname: >> $current_path/$install_version
+	if [ $? != 0 ];then 
+		echo -e "未找到\t$appname    的最新版本号，跳过安装。"
+		continue
+	fi
+	done
 fi
-done
 #删除tmp文件记录组名的临时文件
 #rm -rf $current_path/$inventory_list
 
@@ -176,7 +182,7 @@ done
 #rm -rf $current_path/$install_version
 
 
-
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #本地安装
 #下载主机为ansible控制机
 if [ "$ansible_ip" = "" ];then
@@ -255,21 +261,28 @@ cp $current_path/$images_tmp/* $ansible_tmp
 	if [ -f $SOFT_FILE/$hyapp_main_yaml ];then
 		main_yml hyapp_main_yaml >> $SOFT_FILE/$all_yaml
 	fi
-
-
-	
-
+fi
 
 
 
 
 
-
-
-
-
-
-
-
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#远程安装
+if [ "$ansible_ip" != "" ];then
 
 fi
+
+
+
+
+
+
+
+
+
+
+
+
+echo -e "当前路径下的\t$install_version\t为本次安装的应用版本信息"
+echo -e "当前路径下的\t$inventory_list\t为本次安装的所用应用集合"
