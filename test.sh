@@ -12,6 +12,7 @@ images_tmp="tmp-images"
 
 #ansible环境安装脚本
 ansibletool_install_sh="ansibletool_install.sh"
+ansibletool_install_sh_result="ansibletool_install_result.txt"
 #定义去var文件中的变量函数，需要传递一个var文件中的变量
 get_var() {
 value=`cat $current_path/$var_file | grep -v "#" | grep $1 | awk -F "=" '{print $2}'`
@@ -29,6 +30,7 @@ tee <<EOF
   import_playbook: $1.yml
 EOF
 }
+
 
 #--------------------------------------------------------------------------
 #获取var文件中的所有变量
@@ -107,8 +109,9 @@ if [ "$ansible_ip" != "" ];then
 	if [ "$ansible_port" = "" ];then
 		ansible_port="22"
 	fi
-	echo -e "\033[31m请提前ssh -p $ansible_port $ansible_ip 取消“yes”认证。\033[0m"
+	echo -e "\033[31m请提前ssh -p $ansible_port $ansible_ip 取消远程登录时的“yes”认证。\033[0m"
 	read -s -p "请输入ansible master主机的root密码:"  ansible_pass
+	echo -e "\r"
 fi
 
 
@@ -158,7 +161,6 @@ fi
 
 
 #创建临时下载目录,保证tmp目录干净
-echo -e "\r"
 rm -rf $current_path/$file_tmp
 mkdir $current_path/$file_tmp
 rm -rf $current_path/$images_tmp
@@ -186,13 +188,14 @@ done
 #本地安装
 #下载主机为ansible控制机
 if [ "$ansible_ip" = "" ];then
-#检测本地是否有ansible docker安装环境
-bash $current_path/$ansibletool_install_sh
 
 #ansible环境安装工具
 rm -rf $ansible_tmp
 mkdir -p $ansible_tmp
 cp $current_path/$images_tmp/* $ansible_tmp
+
+#检测本地是否有ansible docker安装环境
+bash $current_path/$ansibletool_install_sh
 
 #传输ansible自动化安装工具
 #进行md5校验
@@ -270,19 +273,33 @@ fi
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #远程安装
 if [ "$ansible_ip" != "" ];then
-
+#检测远程是否有ansible docker安装环境
+sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$ansibletool_install_sh   root@$ansible_ip:/tmp  &> /dev/null
+if [ $? != 0 ];then
+                echo -e "\033[31m$ansibletool_install_sh传输失败，请手动下载！\033[0m"
 fi
 
+#传输环境的安装包
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "rm -rf $ansible_tmp; mkdir -p $ansible_tmp"
+sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$images_tmp/*  root@$ansible_ip:$ansible_tmp
+
+#远程执行环境检测脚本，并回传检测结果
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "/tmp/$ansibletool_install_sh  > /tmp/$ansibletool_install_sh_result"
+sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/$ansibletool_install_sh_result $current_path 
+cat $current_path/$ansibletool_install_sh_result; rm -rf $current_path/$ansibletool_install_sh_result
 
 
+#传输ansible自动化安装工具
+#进行md5校验
+#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_FILE #&> /dev/null"
+#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "SOFT_FILE_numl=`ls $SOFT_FILE |wc -l`"
+#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "if [ "$SOFT_FILE_numl" != "0" ];then echo "ansible执行目录$SOFT_FILE不为空，退出下载程序。"; exit 3 ;fi"
+#sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$file_tmp/* root@$ansible_ip:$SOFT_FILE
+#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "ls $SOFT_FILE/*.tar.gz > /tmp/tmp-hy; for i in `cat /tmp/tmp-hy`; do md5_tmp=`md5sum  $i  |  awk '{print $1}'`; md5_true=`cat $i.md5`; if [ "$md5_tmp" != "$md5_true" ];then echo "$i的md5值为$md5_tmp,正确的md5值为$i.md5，请重新下载。"; continue; else  echo "$i的md5值正确。"; tar -zxf  $i -C $SOFT_FILE; rm -rf $i; rm -rf $i.md5; fi; done"
+#
 
 
-
-
-
-
-
-
-
+fi
+#说明生成文件的作用
 echo -e "当前路径下的\t$install_version\t为本次安装的应用版本信息"
 echo -e "当前路径下的\t$inventory_list\t为本次安装的所用应用集合"
