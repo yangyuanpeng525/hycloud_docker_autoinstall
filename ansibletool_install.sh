@@ -1,12 +1,11 @@
 #!/bin/bash
 
-SOFT_FILE="/TRS/images-hy"
+SOFT_FILE="/tmp/ansible-tmp"
 SOFT_NAME="docker-19.03.8.tgz"
 Ansible_tar="ansible-2.5.1.tar"
 PATH_docker="/usr/bin"
-#PATH_docker="/haha"
+##PATH_docker="/haha"
 
-WORK_SPACE="/TRS/ansible-hy"
 
 #检测ansible命令
 #定义检测结果
@@ -18,7 +17,6 @@ if [ $? != 0 ];then
 else
 
 	echo -e  "\033[32m！！！ansible控制主机已经安装ansible！！！\033[0m"
-        echo -e  "\033[32m！！！请到 $WORK_SPACE 开始安装海云 ！！！\033[0m"
 
 	exit 1
 fi
@@ -45,5 +43,5 @@ docker load -i $SOFT_FILE/$Ansible_tar  &> /dev/null
 docker rm -f ansible &> /dev/null
 docker run --rm -it -d --name ansible -v /TRS:/TRS ansible:2.5.1-ubuntu bash  &> /dev/null
 echo -e "\033[32m！！！ansible容器名：ansible！！！\033[0m"
-echo -e  "\033[32m！！！ansible工具已装好，请到使用 'docker exec -it ansible bash' 命令到容器ansible内 cd $WORK_SPACE目录下开始安装海云 ！！！\033[0m"
+echo -e  "\033[32m！！！ansible工具已装好，请到使用 'docker exec -it ansible bash' 命令到容器内开始安装海云 ！！！\033[0m"
 

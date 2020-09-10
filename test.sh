@@ -10,7 +10,8 @@ var_file="var"
 file_tmp="tmp-hy-ansible"
 images_tmp="tmp-images"
 
-
+#ansible环境安装脚本
+ansibletool_install_sh="ansibletool_install.sh"
 #定义去var文件中的变量函数，需要传递一个var文件中的变量
 get_var() {
 value=`cat $current_path/$var_file | grep -v "#" | grep $1 | awk -F "=" '{print $2}'`
@@ -21,6 +22,13 @@ else
 fi
 }
 
+#定义main.yml生成函数,需要传递一个参数
+main_yml(){
+tee <<EOF
+- name: import $1 安装模块
+  import_playbook: $1.yml
+EOF
+}
 
 #--------------------------------------------------------------------------
 #获取var文件中的所有变量
@@ -43,6 +51,8 @@ if [ "$SOFT_FILE" = "" ];then
         exit 2
 fi
 
+
+#---------------------------------------------------------------------------
 #ansible文件inventory
 inventory="inventory"
 
@@ -62,6 +72,30 @@ install_version="install_version.txt"
 prefix="install_"
 suffix=".tar.gz"
 
+#定义TRS 海云的role，用于生成trsapp_main.yaml hyapp_main.yaml
+ids_role="install_ids"
+ckm_role="install_ckm"
+mas_role="install_mas"
+wechat_role="install_wechat"
+weibo_role="install_weibo"
+echo "$ids_role $ckm_role $mas_role $wechat_role $weibo_role "
+
+iip_role="install_iip"
+igi_role="install_igi"
+igs_role="install_igs"
+ipm_role="install_ipm"
+echo "$iip_role $igi_role $igs_role $ipm_role"
+
+base_main_yaml="base_main.yaml"
+trsapp_main_yaml="trsapp_main.yaml"
+hyapp_main_yaml="hyapp_main.yaml"
+
+all_yaml="main.yaml"
+
+#定义docker ansible的下载地址
+docker_url="http://d.devdemo.trs.net.cn/apollo/devops/tools/docker-19.03.8.tgz"
+ansible_url="http://d.devdemo.trs.net.cn/apollo/devops/tools/ansible-2.5.1.tar"
+ansible_tmp="/tmp/ansible_tmp"
 
 
 
@@ -76,6 +110,9 @@ if [ "$ansible_ip" != "" ];then
 	echo -e "\033[31m请提前ssh -p $ansible_port $ansible_ip 取消“yes”认证。\033[0m"
 	read -s -p "请输入ansible master主机的root密码:"  ansible_pass
 fi
+
+
+
 
 if [ "$ansible_ip" != ""  ];then
 #检测ansible账号密码是否正确
@@ -104,7 +141,7 @@ install_num=`cat $inventory_list | wc -l`
 for i in `seq $install_num`
 do 
 	appname=`cat $current_path/$inventory_list |  awk  "NR==$i {print}"`
-	cat $current_path/$latest_version | grep $appname: >> $current_path/$install_version
+	cat $current_path/$latest_version |grep -v "#" | grep $appname: >> $current_path/$install_version
 if [ $? != 0 ];then 
 	echo -e "未找到\t$appname    的最新版本号，跳过安装。"
 	continue
@@ -121,6 +158,10 @@ mkdir $current_path/$file_tmp
 rm -rf $current_path/$images_tmp
 mkdir $current_path/$images_tmp
 
+#下载docker ansible  的镜像 安装包
+wget $docker_url  -P  $current_path/$images_tmp  &> /dev/null
+wget $ansible_url  -P  $current_path/$images_tmp  &> /dev/null
+
 
 #将版本号和应用拆分，拼接为url并下载安装包
 for app_version  in `cat $current_path/$install_version`
@@ -136,8 +177,17 @@ done
 
 
 
+#本地安装
 #下载主机为ansible控制机
 if [ "$ansible_ip" = "" ];then
+#检测本地是否有ansible docker安装环境
+bash $current_path/$ansibletool_install_sh
+
+#ansible环境安装工具
+rm -rf $ansible_tmp
+mkdir -p $ansible_tmp
+cp $current_path/$images_tmp/* $ansible_tmp
+
 #传输ansible自动化安装工具
 #进行md5校验
 	mkdir -p $SOFT_FILE #&> /dev/null
@@ -165,14 +215,49 @@ if [ "$ansible_ip" = "" ];then
         		rm -rf $i.md5
 		fi
 	done
-#创建roles目录
-	mkdir -p $SOFT_FILE/roles #&> /dev/null
+#合并roles目录
+#	mkdir -p $SOFT_FILE/roles #&> /dev/null
 	cd $SOFT_FILE
 	install_tar=`ls -d install_*`
 	echo $install_tar > /tmp/install_tar
-	mv $SOFT_FILE/$install_tar $SOFT_FILE/roles
+	cp -r $SOFT_FILE/$install_tar/* $SOFT_FILE
+	rm -rf $SOFT_FILE/$install_tar
+
+#main.yaml
+	cd $SOFT_FILE/roles
+	install_role=`ls -d *`
+	echo $install_role > /tmp/install_role
+
+#生成trsapp_main.yml hyapp_main.yaml
+	for i in `cat /tmp/install_role`
+	do
+	if [ "$i" = "$ids_role" ] || [ "$i" = "$ckm_role" ] || [ "$i" = "$mas_role" ] || [ "$i" = "$wechat_role" ] || [ "$i" = "$weibo_role" ];then
+#TRS的trsapp_main_yaml
+	main_yml $i >> $SOFT_FILE/$trsapp_main_yaml
+	continue
+	fi	
+	if [ "$i" = "$iip_role" ] || [ "$i" = "$igi_role" ] || [ "$i" = "$igs_role" ] || [ "$i" = "$ipm_role" ];then
+#海云的hyapp_main_yaml
+	main_yml $i >> $SOFT_FILE/$hyapp_main_yaml
+	continue
+	fi
+#基础的base_main_yaml
+	main_yml $i >> $SOFT_FILE/$base_main_yaml
+	done 
+
+#生成main.yaml
+	if [ -f $SOFT_FILE/$base_main_yaml ];then
+		main_yml base_main_yaml >> $SOFT_FILE/$all_yaml
+	fi
+	if [ -f $SOFT_FILE/$trsapp_main_yaml ];then
+		main_yml trsapp_main_yaml >> $SOFT_FILE/$all_yaml
+	fi
+	if [ -f $SOFT_FILE/$hyapp_main_yaml ];then
+		main_yml hyapp_main_yaml >> $SOFT_FILE/$all_yaml
+	fi
 
 
+	
 
 
 
