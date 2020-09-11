@@ -235,8 +235,11 @@ bash $current_path/$scrips/$ansibletool_install_sh
 	cd $SOFT_FILE
 	install_tar=`ls -d install_*`
 	echo $install_tar > /tmp/install_tar
-	/usr/bin/cp -r $SOFT_FILE/$install_tar/* $SOFT_FILE
-	rm -rf $SOFT_FILE/$install_tar
+	for i in `cat /tmp/install_tar`
+	do
+	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE
+	rm -rf $SOFT_FILE/$i
+	done
 
 #main.yaml
 	cd $SOFT_FILE/roles
