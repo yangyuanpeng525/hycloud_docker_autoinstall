@@ -7,19 +7,22 @@ current_path=`pwd`
 var_file="var"
 
 #定义存放ansible包的临时目录
-file_tmp="tmp-hy-ansible"
-images_tmp="tmp-images"
+file_tmp="tmp/tmp-hy-ansible"
+images_tmp="tmp/tmp-images"
+
+#脚本目录
+scrips="scripts"
 
 #ansible环境安装脚本
 ansibletool_install_sh="ansibletool_install.sh"
 ansibletool_install_sh_result="ansibletool_install_result.txt"
 
 #md5校验脚本
-md5_check_sh_tmp="md5_check.sh.tmp"
+md5_check_sh_tmp="md5_check.sh.temp"
 md5_check_sh="md5_check.sh "
 
 #整合roles目录脚本
-integration_sh_tmp="integration.sh.tmp"
+integration_sh_tmp="integration.sh.temp"
 integration_sh="integration.sh"
 
 #定义去var文件中的变量函数，需要传递一个var文件中的变量
@@ -64,6 +67,9 @@ fi
 
 
 #---------------------------------------------------------------------------
+#定义生成文件存放目录
+doc="doc"
+
 #ansible文件inventory
 inventory="inventory"
 
@@ -89,13 +95,11 @@ ckm_role="install_ckm"
 mas_role="install_mas"
 wechat_role="install_wechat"
 weibo_role="install_weibo"
-echo "$ids_role $ckm_role $mas_role $wechat_role $weibo_role "
 
 iip_role="install_iip"
 igi_role="install_igi"
 igs_role="install_igs"
 ipm_role="install_ipm"
-echo "$iip_role $igi_role $igs_role $ipm_role"
 
 base_main_yaml="base_main.yaml"
 trsapp_main_yaml="trsapp_main.yaml"
@@ -142,38 +146,33 @@ fi
 
 
 #提取inventory中所有组名
-cat $current_path/$inventory  | grep -v "#" | grep "\[" | grep  -v ":"  |  awk -F  "["  '{print $2}' | awk -F "]"   '{print $1}' > $current_path/$inventory_list
+cat $current_path/$inventory  | grep -v "#" | grep "\[" | grep  -v ":"  |  awk -F  "["  '{print $2}' | awk -F "]"   '{print $1}' > $current_path/$doc/$inventory_list
 #对所有组名计数
-install_num=`cat $inventory_list | wc -l`
+install_num=`cat $doc/$inventory_list | wc -l`
 
-#更新本次安装的版本记录文件
-#> $current_path/$install_version
 
 #检测是否存在install_version准备好的安装版本
-if [ -f $current_path/$install_version ];then
+if [ -f $current_path/$doc/$install_version ];then
 	echo "检测到自定义安装的版本号"
 
 else
 #将inventory中提取出的组名与最新版本号记录文件中的记录进行匹配，未找到提示跳过安装
 	for i in `seq $install_num`
 	do 
-		appname=`cat $current_path/$inventory_list |  awk  "NR==$i {print}"`
-		cat $current_path/$latest_version |grep -v "#" | grep $appname: >> $current_path/$install_version
+		appname=`cat $current_path/$doc/$inventory_list |  awk  "NR==$i {print}"`
+		cat $current_path/$latest_version |grep -v "#" | grep $appname: >> $current_path/$doc/$install_version
 	if [ $? != 0 ];then 
 		echo -e "未找到\t$appname    的最新版本号，跳过安装。"
 		continue
 	fi
 	done
 fi
-#删除tmp文件记录组名的临时文件
-#rm -rf $current_path/$inventory_list
-
 
 #创建临时下载目录,保证tmp目录干净
 rm -rf $current_path/$file_tmp
-mkdir $current_path/$file_tmp
+mkdir -p $current_path/$file_tmp
 rm -rf $current_path/$images_tmp
-mkdir $current_path/$images_tmp
+mkdir -p $current_path/$images_tmp
 
 #下载docker ansible  的镜像 安装包
 wget $docker_url  -P  $current_path/$images_tmp  &> /dev/null
@@ -181,7 +180,7 @@ wget $ansible_url  -P  $current_path/$images_tmp  &> /dev/null
 
 
 #将版本号和应用拆分，拼接为url并下载安装包
-for app_version  in `cat $current_path/$install_version`
+for app_version  in `cat $current_path/$doc/$install_version`
 do
 	appname=`echo $app_version | cut -d : -f 1`
 	appversion=`echo $app_version | cut -d : -f 2`
@@ -190,7 +189,6 @@ do
 	wget $wget_url  -P  $current_path/$file_tmp  &> /dev/null
 	wget $wget_url_md5  -P  $current_path/$file_tmp  &> /dev/null
 done
-#rm -rf $current_path/$install_version
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -204,7 +202,7 @@ mkdir -p $ansible_tmp
 cp $current_path/$images_tmp/* $ansible_tmp
 
 #检测本地是否有ansible docker安装环境
-bash $current_path/$ansibletool_install_sh
+bash $current_path/$scrips/$ansibletool_install_sh
 
 #传输ansible自动化安装工具
 #进行md5校验
@@ -283,9 +281,9 @@ fi
 #远程安装
 if [ "$ansible_ip" != "" ];then
 #检测远程是否有ansible docker安装环境
-sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$ansibletool_install_sh   root@$ansible_ip:/tmp  &> /dev/null
+sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$scrips/$ansibletool_install_sh   root@$ansible_ip:/tmp  &> /dev/null
 if [ $? != 0 ];then
-                echo -e "\033[31m$ansibletool_install_sh传输失败，请手动下载！\033[0m"
+                echo -e "\033[31m$scrips/$ansibletool_install_sh传输失败，请手动下载！\033[0m"
 fi
 
 #传输环境的安装包
@@ -293,7 +291,7 @@ sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "rm -rf $ansib
 sshpass  -p "$ansible_pass" scp -P $ansible_port  $current_path/$images_tmp/*  root@$ansible_ip:$ansible_tmp
 
 #远程执行环境检测脚本，并回传检测结果
-sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "/tmp/$ansibletool_install_sh  > /tmp/$ansibletool_install_sh_result"
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "bash /tmp/$ansibletool_install_sh  > /tmp/$ansibletool_install_sh_result"
 sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/$ansibletool_install_sh_result $current_path 
 cat $current_path/$ansibletool_install_sh_result; rm -rf $current_path/$ansibletool_install_sh_result
 
@@ -312,30 +310,23 @@ fi
 
 
 #对远程传输的ansible工具进行md5校验
-cp $current_path/$md5_check_sh_tmp $current_path/$md5_check_sh
-sed -i   s@\$SOFT_FILE@$SOFT_FILE@g  $md5_check_sh
-sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$md5_check_sh root@$ansible_ip:/tmp
-rm -rf $current_path/$md5_check_sh
+cp $current_path/$scrips/$md5_check_sh_tmp $current_path/$scrips/$md5_check_sh
+sed -i   s@\$SOFT_FILE@$SOFT_FILE@g  $scrips/$md5_check_sh
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$scrips/$md5_check_sh root@$ansible_ip:/tmp
+rm -rf $current_path/$scrips/$md5_check_sh
 sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "bash /tmp/$md5_check_sh > /tmp/md5_check"
+#回传md5校验值
 sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/md5_check $current_path
 cat $current_path/md5_check; rm -rf $current_path/md5_check
 
 #整合roles
-cp $current_path/$integration_sh_tmp $current_path/$integration_sh
-sed -i   s@\$SOFT_FILE@$SOFT_FILE@g  $integration_sh
-sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$integration_sh root@$ansible_ip:/tmp
-rm -rf $current_path/$integration_sh
+cp $current_path/$scrips/$integration_sh_tmp $current_path/$scrips/$integration_sh
+sed -i   s@\$SOFT_FILE@$SOFT_FILE@g  $scrips/$integration_sh
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$scrips/$integration_sh root@$ansible_ip:/tmp
+rm -rf $current_path/$scrips/$integration_sh
 sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "bash /tmp/$integration_sh"
-
-
-
-
-
-
-
-
 
 fi
 #说明生成文件的作用
-echo -e "当前路径下的\t$install_version\t为本次安装的应用版本信息"
-echo -e "当前路径下的\t$inventory_list\t为本次安装的所用应用集合"
+echo -e "当前路径下的\t\033[32m$doc/$install_version\033[0m\t为本次安装的应用版本信息"
+echo -e "当前路径下的\t\033[32m$doc/$inventory_list\033[0m\t为本次安装的所用应用集合"
