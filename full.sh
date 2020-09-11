@@ -153,7 +153,7 @@ install_num=`cat $doc/$inventory_list | wc -l`
 
 #检测是否存在install_version准备好的安装版本
 if [ -f $current_path/$doc/$install_version ];then
-	echo "检测到自定义安装的版本号"
+	echo -e "检测到自定义安装的版本文件：\033[32m$doc/$install_version\033[0m"
 
 else
 #将inventory中提取出的组名与最新版本号记录文件中的记录进行匹配，未找到提示跳过安装
