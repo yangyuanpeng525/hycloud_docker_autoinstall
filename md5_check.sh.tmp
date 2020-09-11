@@ -1,0 +1,19 @@
+#/bin/bash
+ls $SOFT_FILE/*.tar.gz > /tmp/tmp-hy
+
+	for i in `cat /tmp/tmp-hy`
+	do
+#md5校验，并比较
+	md5_tmp=`md5sum  $i  |  awk '{print $1}'`
+	md5_true=`cat $i.md5`
+		if [ "$md5_tmp" != "$md5_true" ];then
+			echo "$i的md5值为$md5_tmp,正确的md5值为$i.md5，请重新下载。"
+			continue
+		else 
+			echo "$i的md5值正确。"
+#解压
+	        	tar -zxf  $i -C $SOFT_FILE
+        		rm -rf $i
+        		rm -rf $i.md5
+		fi
+	done
