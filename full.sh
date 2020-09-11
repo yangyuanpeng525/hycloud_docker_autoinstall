@@ -235,7 +235,7 @@ bash $current_path/$scrips/$ansibletool_install_sh
 	cd $SOFT_FILE
 	install_tar=`ls -d install_*`
 	echo $install_tar > /tmp/install_tar
-	cp -r $SOFT_FILE/$install_tar/* $SOFT_FILE
+	/usr/bin/cp -r $SOFT_FILE/$install_tar/* $SOFT_FILE
 	rm -rf $SOFT_FILE/$install_tar
 
 #main.yaml
