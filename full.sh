@@ -68,7 +68,7 @@ fi
 
 #---------------------------------------------------------------------------
 #定义生成文件存放目录
-doc="doc"
+doc="docs"
 
 #ansible文件inventory
 inventory="inventory"
@@ -232,7 +232,6 @@ bash $current_path/$scrips/$ansibletool_install_sh
 		fi
 	done
 #合并roles目录
-#	mkdir -p $SOFT_FILE/roles #&> /dev/null
 	cd $SOFT_FILE
 	install_tar=`ls -d install_*`
 	echo $install_tar > /tmp/install_tar
@@ -328,5 +327,5 @@ sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "bash /tmp/$in
 
 fi
 #说明生成文件的作用
-echo -e "当前路径下的\t\033[32m$doc/$install_version\033[0m\t为本次安装的应用版本信息"
-echo -e "当前路径下的\t\033[32m$doc/$inventory_list\033[0m\t为本次安装的所用应用集合"
+echo -e "当前路径下的\t\033[32m$doc/$install_version\033[0m\t为本次已安装的应用版本信息"
+echo -e "当前路径下的\t\033[32m$doc/$inventory_list\033[0m\t为本次应安装的应用集合"
