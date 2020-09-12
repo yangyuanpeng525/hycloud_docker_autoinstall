@@ -73,6 +73,9 @@ doc="docs"
 #ansible文件inventory
 inventory="inventory"
 
+#ansible配置文件
+ansible_cfg="ansible.cfg"
+
 #将inventory中的组提取出来
 inventory_list="inventory_list"
 
@@ -273,6 +276,10 @@ bash $current_path/$scrips/$ansibletool_install_sh
 	if [ -f $SOFT_FILE/$hyapp_main_yaml ];then
 		main_yml hyapp_main_yaml >> $SOFT_FILE/$all_yaml
 	fi
+
+#传递ansible.cfg配置文件
+cp $current_path/$doc/$ansible_cfg $SOFT_FILE
+cp $current_path/$inventory $SOFT_FILE
 fi
 
 
@@ -327,6 +334,10 @@ sed -i   s@\$SOFT_FILE@$SOFT_FILE@g  $scrips/$integration_sh
 sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$scrips/$integration_sh root@$ansible_ip:/tmp
 rm -rf $current_path/$scrips/$integration_sh
 sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "bash /tmp/$integration_sh"
+#传递ansible.cfg配置文件
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$doc/$ansible_cfg root@$ansible_ip:$SOFT_FILE
+#传递inventory文件
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$inventory root@$ansible_ip:$SOFT_FILE
 
 fi
 #说明生成文件的作用
