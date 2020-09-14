@@ -1,13 +1,13 @@
 #最新的版本号
-#redis:5.0
+redis:5.0
 elasticsearch:5.6.3
 logstash:5.5.0
 nginx:1.18.0
-#nginx-net:1.18.0
-#mariadb:10.4.12
-#mariadb-net:10.4.12
-#rabbitmq:3.7.14
-#zabbix:3.4.3
+nginx-net:1.18.0
+mariadb:10.4.12
+mariadb-net:10.4.12
+rabbitmq:3.7.14
+zabbix:3.4.3
 
 
 #TRS
