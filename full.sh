@@ -13,6 +13,9 @@ images_tmp="tmp/tmp-images"
 #脚本目录
 scrips="scripts"
 
+#inventory db目录
+info="info"
+
 #ansible环境安装脚本
 ansibletool_install_sh="ansibletool_install.sh"
 ansibletool_install_sh_result="ansibletool_install_result.txt"
@@ -39,7 +42,7 @@ fi
 main_yml(){
 tee <<EOF
 - name: import $1 安装模块
-  import_playbook: $1.yml
+  import_playbook: $1
 EOF
 }
 
@@ -73,6 +76,8 @@ doc="docs"
 #ansible文件inventory
 inventory="inventory"
 
+#db info
+dbinfo="dbinfo.yml"
 #ansible配置文件
 ansible_cfg="ansible.cfg"
 
@@ -93,6 +98,8 @@ prefix="install_"
 suffix=".tar.gz"
 
 #定义TRS 海云的role，用于生成trsapp_main.yaml hyapp_main.yaml
+#logstash没有单独的playbook
+logstash_role="install_logstash"
 ids_role="install_ids"
 ckm_role="install_ckm"
 mas_role="install_mas"
@@ -149,7 +156,7 @@ fi
 
 
 #提取inventory中所有组名
-cat $current_path/$inventory  | grep -v "#" | grep "\[" | grep  -v ":"  |  awk -F  "["  '{print $2}' | awk -F "]"   '{print $1}' > $current_path/$doc/$inventory_list
+cat $current_path/$info/$inventory  | grep -v "#" | grep "\[" | grep  -v ":"  |  awk -F  "["  '{print $2}' | awk -F "]"   '{print $1}' > $current_path/$doc/$inventory_list
 #对所有组名计数
 install_num=`cat $doc/$inventory_list | wc -l`
 
@@ -163,7 +170,7 @@ else
 	for i in `seq $install_num`
 	do 
 		appname=`cat $current_path/$doc/$inventory_list |  awk  "NR==$i {print}"`
-		cat $current_path/$latest_version |grep -v "#" | grep $appname: >> $current_path/$doc/$install_version
+		cat $current_path/$doc/$latest_version |grep -v "#" | grep $appname: >> $current_path/$doc/$install_version
 	if [ $? != 0 ];then 
 		echo -e "未找到\t$appname    的最新版本号，跳过安装。"
 		continue
@@ -190,7 +197,13 @@ do
 	wget_url=$url/$appname/$appversion/$prefix$appname-$appversion$suffix
 	wget_url_md5=$url/$appname/$appversion/$prefix$appname-$appversion$suffix.md5
 	wget $wget_url  -P  $current_path/$file_tmp  &> /dev/null
+	if [ $? != 0 ];then
+	echo "$wget_url下载失败。"
+	fi
 	wget $wget_url_md5  -P  $current_path/$file_tmp  &> /dev/null
+	if [ $? != 0 ];then
+	echo "$wget_url下载失败。"
+	fi
 done
 
 
@@ -254,32 +267,37 @@ bash $current_path/$scrips/$ansibletool_install_sh
 	do
 	if [ "$i" = "$ids_role" ] || [ "$i" = "$ckm_role" ] || [ "$i" = "$mas_role" ] || [ "$i" = "$wechat_role" ] || [ "$i" = "$weibo_role" ];then
 #TRS的trsapp_main_yaml
-	main_yml $i >> $SOFT_FILE/$trsapp_main_yaml
+	main_yml $i.yml >> $SOFT_FILE/$trsapp_main_yaml
 	continue
 	fi	
 	if [ "$i" = "$iip_role" ] || [ "$i" = "$igi_role" ] || [ "$i" = "$igs_role" ] || [ "$i" = "$ipm_role" ];then
 #海云的hyapp_main_yaml
-	main_yml $i >> $SOFT_FILE/$hyapp_main_yaml
+	main_yml $i.yml >> $SOFT_FILE/$hyapp_main_yaml
+	continue
+	fi
+#logstash 跟iip一起装,没有单独的playbook
+	if [ "$i" = "$logstash_role" ];then
 	continue
 	fi
 #基础的base_main_yaml
-	main_yml $i >> $SOFT_FILE/$base_main_yaml
+	main_yml $i.yml >> $SOFT_FILE/$base_main_yaml
 	done 
 
 #生成main.yaml
 	if [ -f $SOFT_FILE/$base_main_yaml ];then
-		main_yml base_main_yaml >> $SOFT_FILE/$all_yaml
+		main_yml $base_main_yaml >> $SOFT_FILE/$all_yaml
 	fi
 	if [ -f $SOFT_FILE/$trsapp_main_yaml ];then
-		main_yml trsapp_main_yaml >> $SOFT_FILE/$all_yaml
+		main_yml $trsapp_main_yaml >> $SOFT_FILE/$all_yaml
 	fi
 	if [ -f $SOFT_FILE/$hyapp_main_yaml ];then
-		main_yml hyapp_main_yaml >> $SOFT_FILE/$all_yaml
+		main_yml $hyapp_main_yaml >> $SOFT_FILE/$all_yaml
 	fi
 
 #传递ansible.cfg配置文件
-cp $current_path/$doc/$ansible_cfg $SOFT_FILE
-cp $current_path/$inventory $SOFT_FILE
+cp $current_path/$info/$ansible_cfg $SOFT_FILE
+cp $current_path/$info/$inventory $SOFT_FILE
+cp $current_path/$info/$dbinfo $SOFT_FILE
 fi
 
 
@@ -335,9 +353,11 @@ sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$scrips/$integrat
 rm -rf $current_path/$scrips/$integration_sh
 sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "bash /tmp/$integration_sh"
 #传递ansible.cfg配置文件
-sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$doc/$ansible_cfg root@$ansible_ip:$SOFT_FILE
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$ansible_cfg root@$ansible_ip:$SOFT_FILE
 #传递inventory文件
-sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$inventory root@$ansible_ip:$SOFT_FILE
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$inventory root@$ansible_ip:$SOFT_FILE
+#传递db info文件
+sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$dbinfo root@$ansible_ip:$SOFT_FILE
 
 fi
 #说明生成文件的作用

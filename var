@@ -2,6 +2,5 @@
 url=http://d.devdemo.trs.net.cn/hy/devops-hy
 
 #定义ansible master主机ansible执行目录
-#SOFT_FILE=/home/devops
-
+#默认，可修改
 SOFT_FILE=/TRS/ansible-hy
