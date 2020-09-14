@@ -4,5 +4,5 @@
 current_path=`pwd`
 
 
-cd $current_path/hy; python2 parse.py
-cd $current_path/hy/Ansible_Install_HyCloud;bash wget.sh
+cd $current_path; python2 parse.py
+cd $current_path/Ansible_Install_HyCloud;bash wget.sh

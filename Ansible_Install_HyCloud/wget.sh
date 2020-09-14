@@ -3,6 +3,7 @@
 #获取当前的路径
 current_path=`pwd`
 
+file="Ansible_Install_HyCloud"
 #定义变量文件
 var_file="var"
 
@@ -366,6 +367,6 @@ sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$dbinfo roo
 rm -rf $current_path/$tmp
 fi
 #说明生成文件的作用
-echo -e "当前路径下的\t\033[32m$doc/$install_version\033[0m\t为本次已安装的应用版本信息"
-echo -e "当前路径下的\t\033[32m$doc/$inventory_list\033[0m\t为本次应安装的应用集合"
+echo -e "当前路径下的\t\033[32m$file/$doc/$install_version\033[0m\t为本次已安装的应用版本信息"
+echo -e "当前路径下的\t\033[32m$file/$doc/$inventory_list\033[0m\t为本次应安装的应用集合"
 echo -e "工程目录：\033[31m$SOFT_FILE\033[0m"
