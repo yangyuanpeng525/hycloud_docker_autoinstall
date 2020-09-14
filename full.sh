@@ -9,6 +9,7 @@ var_file="var"
 #定义存放ansible包的临时目录
 file_tmp="tmp/tmp-hy-ansible"
 images_tmp="tmp/tmp-images"
+tmp="tmp"
 
 #脚本目录
 scrips="scripts"
@@ -298,6 +299,8 @@ bash $current_path/$scrips/$ansibletool_install_sh
 cp $current_path/$info/$ansible_cfg $SOFT_FILE
 cp $current_path/$info/$inventory $SOFT_FILE
 cp $current_path/$info/$dbinfo $SOFT_FILE
+#删除下载目录
+rm -rf $current_path/$tmp
 fi
 
 
@@ -358,7 +361,8 @@ sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$ansible_cf
 sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$inventory root@$ansible_ip:$SOFT_FILE
 #传递db info文件
 sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$info/$dbinfo root@$ansible_ip:$SOFT_FILE
-
+#删除下载目录
+rm -rf $current_path/$tmp
 fi
 #说明生成文件的作用
 echo -e "当前路径下的\t\033[32m$doc/$install_version\033[0m\t为本次已安装的应用版本信息"
