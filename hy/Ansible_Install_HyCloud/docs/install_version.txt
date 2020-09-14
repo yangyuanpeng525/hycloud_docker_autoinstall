@@ -1,7 +1,0 @@
-redis:5.0
-nginx:1.18.0
-mariadb:10.4.12
-logstash:5.5.0
-rabbitmq:3.7.14
-zabbix:3.4.3
-elasticsearch:5.6.3
