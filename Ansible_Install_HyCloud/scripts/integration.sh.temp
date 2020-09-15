@@ -1,31 +1,4 @@
 #!/bin/bash
-#定义TRS 海云的role，用于生成trsapp_main.yaml hyapp_main.yaml
-logstash_role="install_logstash"
-ids_role="install_ids"
-ckm_role="install_ckm"
-mas_role="install_mas"
-wechat_role="install_wechat"
-weibo_role="install_weibo"
-
-iip_role="install_iip"
-igi_role="install_igi"
-igs_role="install_igs"
-ipm_role="install_ipm"
-
-base_main_yaml="base_main.yaml"
-trsapp_main_yaml="trsapp_main.yaml"
-hyapp_main_yaml="hyapp_main.yaml"
-
-all_yaml="main.yaml"
-
-#定义main.yml生成函数,需要传递一个参数
-main_yml(){
-tee <<EOF
-- name: import $1 安装模块
-  import_playbook: $1
-EOF
-}
-
 
 #合并roles目录
 	cd $SOFT_FILE
@@ -36,39 +9,3 @@ EOF
 		cp -r $SOFT_FILE/$i/* $SOFT_FILE
 		rm -rf $SOFT_FILE/$i
 	done 
-##main.yaml
-#	cd $SOFT_FILE/roles
-#	install_role=`ls -d *`
-#	echo $install_role > /tmp/install_role
-#
-##生成trsapp_main.yml hyapp_main.yaml
-#	for i in `cat /tmp/install_role`
-#	do
-#	if [ "$i" = "$ids_role" ] || [ "$i" = "$ckm_role" ] || [ "$i" = "$mas_role" ] || [ "$i" = "$wechat_role" ] || [ "$i" = "$weibo_role" ];then
-##TRS的trsapp_main_yaml
-#	main_yml $i.yml >> $SOFT_FILE/$trsapp_main_yaml
-#	continue
-#	fi	
-#	if [ "$i" = "$iip_role" ] || [ "$i" = "$igi_role" ] || [ "$i" = "$igs_role" ] || [ "$i" = "$ipm_role" ];then
-##海云的hyapp_main_yaml
-#	main_yml $i.yml >> $SOFT_FILE/$hyapp_main_yaml
-#	continue
-#	fi
-##logstash 跟iip一起装,没有单独的playbook
-#        if [ "$i" = "$logstash_role" ];then
-#        continue
-#        fi
-##基础的base_main_yaml
-#	main_yml $i.yml >> $SOFT_FILE/$base_main_yaml
-#	done 
-#
-##生成main.yaml
-#	if [ -f $SOFT_FILE/$base_main_yaml ];then
-#		main_yml $base_main_yaml >> $SOFT_FILE/$all_yaml
-#	fi
-#	if [ -f $SOFT_FILE/$trsapp_main_yaml ];then
-#		main_yml $trsapp_main_yaml >> $SOFT_FILE/$all_yaml
-#	fi
-#	if [ -f $SOFT_FILE/$hyapp_main_yaml ];then
-#		main_yml $hyapp_main_yaml >> $SOFT_FILE/$all_yaml
-#	fi
