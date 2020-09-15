@@ -183,7 +183,7 @@ date1=`date +%s`
 #将版本号和应用拆分，拼接为url并下载安装包
 for app_version  in `cat $current_path/$doc/$install_version`
 do
-#{
+{
 	appname=`echo $app_version | cut -d : -f 1`
 	appversion=`echo $app_version | cut -d : -f 2`
 	wget_url=$url/$appname/$appversion/$prefix$appname-$appversion$suffix
@@ -196,10 +196,10 @@ do
 	if [ $? != 0 ];then
 	echo "$wget_url下载失败。"
 	fi
-#}&
+}&
 
 done
-#wait
+wait
 date2=`date +%s`
 let date3=date2-date1
 echo $date3
@@ -225,8 +225,7 @@ date6=`date +%s`
 	do
 
 #md5校验，并比较
-#{
-	md5_tmp=`md5sum  $i  |  awk '{print $1}'`
+{	md5_tmp=`md5sum  $i  |  awk '{print $1}'`
 	md5_true=`cat $i.md5`
 		if [ "$md5_tmp" != "$md5_true" ];then
 			echo "$i的md5值为$md5_tmp,正确的md5值为$i.md5，请重新下载。"
@@ -240,9 +239,9 @@ date6=`date +%s`
 			echo "$i的md5值正确。"
 		
 		 fi
-#}&
+}&
 	done
-#wait
+wait
 date4=`date +%s`
 let date5=date4-date6
 echo $date5
