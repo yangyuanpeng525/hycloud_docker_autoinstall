@@ -41,12 +41,12 @@ fi
 }
 
 #定义main.yml生成函数,需要传递一个参数
-main_yml(){
-tee <<EOF
-- name: import $1 安装模块
-  import_playbook: $1
-EOF
-}
+#main_yml(){
+#tee <<EOF
+#- name: import $1 安装模块
+#  import_playbook: $1
+#EOF
+#}
 
 
 #--------------------------------------------------------------------------
@@ -99,25 +99,25 @@ install_version="install_version.txt"
 prefix="install_"
 suffix=".tar.gz"
 
-#定义TRS 海云的role，用于生成trsapp_main.yaml hyapp_main.yaml
-#logstash没有单独的playbook
-logstash_role="install_logstash"
-ids_role="install_ids"
-ckm_role="install_ckm"
-mas_role="install_mas"
-wechat_role="install_wechat"
-weibo_role="install_weibo"
-
-iip_role="install_iip"
-igi_role="install_igi"
-igs_role="install_igs"
-ipm_role="install_ipm"
-
-base_main_yaml="base_main.yaml"
-trsapp_main_yaml="trsapp_main.yaml"
-hyapp_main_yaml="hyapp_main.yaml"
-
-all_yaml="main.yaml"
+##定义TRS 海云的role，用于生成trsapp_main.yaml hyapp_main.yaml
+##logstash没有单独的playbook
+#logstash_role="install_logstash"
+#ids_role="install_ids"
+#ckm_role="install_ckm"
+#mas_role="install_mas"
+#wechat_role="install_wechat"
+#weibo_role="install_weibo"
+#
+#iip_role="install_iip"
+#igi_role="install_igi"
+#igs_role="install_igs"
+#ipm_role="install_ipm"
+#
+#base_main_yaml="base_main.yaml"
+#trsapp_main_yaml="trsapp_main.yaml"
+#hyapp_main_yaml="hyapp_main.yaml"
+#
+#all_yaml="main.yaml"
 
 #定义docker ansible的下载地址
 docker_url="http://d.devdemo.trs.net.cn/apollo/devops/tools/docker-19.03.8.tgz"
@@ -140,7 +140,15 @@ if [ "$ansible_ip" != "" ];then
 	echo -e "\r"
 fi
 
-
+#检测工程目录是否为空
+if [ "$ansible_ip" = ""  ];then
+	mkdir -p $SOFT_FILE #&> /dev/null
+	SOFT_FILE_numl=`ls $SOFT_FILE |wc -l`
+	if [ "$SOFT_FILE_numl" != "0" ];then
+		echo "ansible执行目录$SOFT_FILE不为空，退出下载程序。"
+		exit 3
+	fi	
+fi
 
 
 if [ "$ansible_ip" != ""  ];then
@@ -155,6 +163,14 @@ if [ "$ansible_ip" != ""  ];then
 	        exit 2
 	fi
 	rm -rf $current_path/check.txt
+#检测工程目录是否为空
+sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_FILE; ls $SOFT_FILE | wc -l > /tmp/file_num"
+sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/file_num  /tmp
+file_num=`cat /tmp/file_num`
+	if [ "$file_num" != ""0 ];then
+        	echo "$ansible_ip的ansible执行目录$SOFT_FILE不为空，程序退出。"
+        	exit 2
+	fi
 fi
 
 
@@ -225,12 +241,12 @@ bash $current_path/$scrips/$ansibletool_install_sh
 
 #传输ansible自动化安装工具
 #进行md5校验
-	mkdir -p $SOFT_FILE #&> /dev/null
-	SOFT_FILE_numl=`ls $SOFT_FILE |wc -l`
-	if [ "$SOFT_FILE_numl" != "0" ];then
-		echo "ansible执行目录$SOFT_FILE不为空，退出下载程序。"
-		exit 3
-	fi
+#	mkdir -p $SOFT_FILE #&> /dev/null
+#	SOFT_FILE_numl=`ls $SOFT_FILE |wc -l`
+#	if [ "$SOFT_FILE_numl" != "0" ];then
+#		echo "ansible执行目录$SOFT_FILE不为空，退出下载程序。"
+#		exit 3
+#	fi
 	cp $current_path/$file_tmp/*  $SOFT_FILE
 	ls $SOFT_FILE/*.tar.gz > /tmp/tmp-hy
 
@@ -330,15 +346,15 @@ cat $current_path/$ansibletool_install_sh_result; rm -rf $current_path/$ansiblet
 
 #检测远程目标主机ansible执行路径是否为空，不为空退出。
 
-sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_FILE; ls $SOFT_FILE | wc -l > /tmp/file_num"
-sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/file_num  /tmp
-file_num=`cat /tmp/file_num`
-if [ "$file_num" != ""0 ];then
-	echo "$ansible_ip的ansible执行目录$SOFT_FILE不为空，程序退出。"
-	exit 2
-else 
+#sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOFT_FILE; ls $SOFT_FILE | wc -l > /tmp/file_num"
+#sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/file_num  /tmp
+#file_num=`cat /tmp/file_num`
+#if [ "$file_num" != ""0 ];then
+#	echo "$ansible_ip的ansible执行目录$SOFT_FILE不为空，程序退出。"
+#	exit 2
+#else 
 	sshpass  -p "$ansible_pass" scp -P $ansible_port $current_path/$file_tmp/* root@$ansible_ip:$SOFT_FILE
-fi
+#fi
 
 
 #对远程传输的ansible工具进行md5校验
