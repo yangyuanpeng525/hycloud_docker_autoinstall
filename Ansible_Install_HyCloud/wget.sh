@@ -145,7 +145,7 @@ if [ "$ansible_ip" = ""  ];then
 	mkdir -p $SOFT_FILE #&> /dev/null
 	SOFT_FILE_numl=`ls $SOFT_FILE |wc -l`
 	if [ "$SOFT_FILE_numl" != "0" ];then
-		echo "ansible执行目录$SOFT_FILE不为空，退出下载程序。"
+		echo -e "本地的ansible执行目录\033[31m$SOFT_FILE\033[0m不为空，退出下载程序。"
 		exit 3
 	fi	
 fi
@@ -168,7 +168,7 @@ sshpass  -p "$ansible_pass" ssh -p $ansible_port root@$ansible_ip "mkdir -p $SOF
 sshpass  -p "$ansible_pass" scp -P $ansible_port root@$ansible_ip:/tmp/file_num  /tmp
 file_num=`cat /tmp/file_num`
 	if [ "$file_num" != ""0 ];then
-        	echo "$ansible_ip的ansible执行目录$SOFT_FILE不为空，程序退出。"
+        	echo -e "$ansible_ip的ansible执行目录\033[31m$SOFT_FILE\033[0m不为空，程序退出。"
         	exit 2
 	fi
 fi
