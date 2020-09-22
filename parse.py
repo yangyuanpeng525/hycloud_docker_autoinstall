@@ -49,7 +49,7 @@ while True:
     subprocess.call('rm -f -r tmp/*', shell=True)
 
 
-    subprocess.call('java -jar anallysisExcel.jar %s %s'%(ExcelFileName, os.path.join(BaseFolder, 'tmp')), shell=True)
+    subprocess.call('java -jar devops-tool-0.0.1-SNAPSHOT.jar %s %s'%(ExcelFileName, os.path.join(BaseFolder, 'tmp')), shell=True)
     print (ExcelFileName+'  文件解析完成')
 
     break
@@ -69,12 +69,15 @@ with open(os.path.join(BaseFolder, 'tmp', 'all-inventory'), mode='w') as f:
     for section in SectionDict:
         f.write('[%s]'%(section,)+'\n')
         for option in SectionDict[section]:
-            f.write('='.join(option)+'\n')
+	    if ":var" in section:
+                f.write('='.join(option)+'\n')
+	    else:
+  	        f.write(':'.join(option)+'\n')
         f.write('\n')
 
 
 subprocess.call('rm -f Ansible_Install_HyCloud/info/inventory',shell=True)
-subprocess.call('rm -f Ansible_Install_HyCloud/info/dbinfo.yaml',shell=True)
+subprocess.call('rm -f Ansible_Install_HyCloud/info/dbinfo.yml',shell=True)
 
-subprocess.call('cp tmp/dbinfo.yaml Ansible_Install_HyCloud/info/', shell=True)
+subprocess.call('cp tmp/dbinfo.yml Ansible_Install_HyCloud/info/', shell=True)
 subprocess.call('cp tmp/all-inventory Ansible_Install_HyCloud/info/inventory', shell=True)
