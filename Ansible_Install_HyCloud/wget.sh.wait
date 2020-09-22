@@ -194,7 +194,7 @@ do
 	fi
 	wget $wget_url_md5  -P  $current_path/$file_tmp  &> /dev/null
 	if [ $? != 0 ];then
-	echo "$wget_url下载失败。"
+	echo "$wget_url_md5下载失败。"
 	fi
 }&
 
