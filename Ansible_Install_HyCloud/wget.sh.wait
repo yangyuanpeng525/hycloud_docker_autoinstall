@@ -188,6 +188,7 @@ do
 	appversion=`echo $app_version | cut -d : -f 2`
 	wget_url=$url/$appname/$appversion/$prefix$appname-$appversion$suffix
 	wget_url_md5=$url/$appname/$appversion/$prefix$appname-$appversion$suffix.md5
+	echo "-------开始下载------------"
 	wget $wget_url  -P  $current_path/$file_tmp  &> /dev/null
 	if [ $? != 0 ];then
 	echo "$wget_url下载失败。"
