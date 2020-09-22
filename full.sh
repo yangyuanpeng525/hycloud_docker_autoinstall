@@ -9,4 +9,4 @@ if [ $? != 0 ];then
 	exit 2
 fi
 
-cd $current_path/Ansible_Install_HyCloud;bash wget.sh
+cd $current_path/Ansible_Install_HyCloud;bash wget.sh.wait
