@@ -227,7 +227,7 @@ date6=`date +%s`
 	for i in `cat /tmp/tmp-hy`
 	do
 
-echo "开始校验md5值，并解压合并"
+echo "----------------开始校验md5值，并解压合并-----------------"
 #md5校验，并比较
 {	md5_tmp=`md5sum  $i  |  awk '{print $1}'`
 	md5_true=`cat $i.md5`
@@ -261,7 +261,7 @@ echo "解压耗时$date5 S"
 	fi
 	rm -rf $SOFT_FILE/$i
 	done
-echo "合并完成"
+echo "----------合并完成--------------"
 #传递ansible.cfg配置文件
 cp $current_path/$info/$ansible_cfg $SOFT_FILE
 cp $current_path/$info/$inventory $SOFT_FILE
