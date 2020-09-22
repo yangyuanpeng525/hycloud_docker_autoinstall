@@ -156,6 +156,7 @@ if [ -f $current_path/$doc/$install_version ];then
 else
 #将inventory中提取出的组名与最新版本号记录文件中的记录进行匹配，未找到提示跳过安装
 	echo "docker:19.03.8" >> $current_path/$doc/$install_version
+	echo "igses:2.3.3" >> $current_path/$doc/$install_version
 	for i in `seq $install_num`
 	do 
 		appname=`cat $current_path/$doc/$inventory_list |  awk  "NR==$i {print}"`
