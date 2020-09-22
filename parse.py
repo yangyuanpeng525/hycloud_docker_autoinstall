@@ -69,7 +69,7 @@ with open(os.path.join(BaseFolder, 'tmp', 'all-inventory'), mode='w') as f:
     for section in SectionDict:
         f.write('[%s]'%(section,)+'\n')
         for option in SectionDict[section]:
-            f.write(':'.join(option)+'\n')
+            f.write('='.join(option)+'\n')
         f.write('\n')
 
 
