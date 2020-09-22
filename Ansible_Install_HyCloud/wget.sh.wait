@@ -251,7 +251,10 @@ echo $date5
 	echo $install_tar > /tmp/install_tar
 	for i in `cat /tmp/install_tar`
 	do
-	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE
+	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE &> /dev/null
+	if [ $? != 0 ] ;then
+		echo "$i合并错误，请联系管理员"
+	fi
 	rm -rf $SOFT_FILE/$i
 	done
 
