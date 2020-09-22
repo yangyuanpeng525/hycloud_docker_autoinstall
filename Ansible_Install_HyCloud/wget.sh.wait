@@ -173,6 +173,7 @@ rm -rf $current_path/$images_tmp
 mkdir -p $current_path/$images_tmp
 
 #下载docker ansible  的镜像 安装包
+echo "---------ansible master 主机初始化开始----------"
 wget $docker_url  -P  $current_path/$images_tmp  &> /dev/null
 wget $ansible_url  -P  $current_path/$images_tmp  &> /dev/null
 wget $mysql_python_url -P $current_path/$images_tmp  &> /dev/null
@@ -188,7 +189,7 @@ do
 	appversion=`echo $app_version | cut -d : -f 2`
 	wget_url=$url/$appname/$appversion/$prefix$appname-$appversion$suffix
 	wget_url_md5=$url/$appname/$appversion/$prefix$appname-$appversion$suffix.md5
-	echo "-------开始下载------------"
+	echo "----------开始下载------------"
 	wget $wget_url  -P  $current_path/$file_tmp  &> /dev/null
 	if [ $? != 0 ];then
 	echo "$wget_url下载失败。"
