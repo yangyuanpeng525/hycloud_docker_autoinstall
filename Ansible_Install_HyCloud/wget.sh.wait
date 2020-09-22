@@ -234,6 +234,8 @@ echo "----------------开始校验md5值，并解压合并-----------------"
 	md5_true=`cat $i.md5`
 		if [ "$md5_tmp" != "$md5_true" ];then
 			echo "$i的md5值为$md5_tmp,正确的md5值为$i.md5，请重新下载。"
+			rm -rf $i
+			rm -rf $(i).md5
 			continue
 		else 
 			#echo "$i的md5值正确。"
@@ -256,7 +258,7 @@ echo "解压耗时$date5 S"
 	echo $install_tar > /tmp/install_tar
 	for i in `cat /tmp/install_tar`
 	do
-	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE #&> /dev/null
+	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE &> /dev/null 
 	if [ $? != 0 ] ;then
 		echo "$i合并错误，请联系管理员"
 	fi
