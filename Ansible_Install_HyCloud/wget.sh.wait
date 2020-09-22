@@ -202,7 +202,7 @@ done
 wait
 date2=`date +%s`
 let date3=date2-date1
-echo $date3
+echo "下载耗时$date3"
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #本地安装
 #下载主机为ansible控制机
@@ -244,7 +244,7 @@ date6=`date +%s`
 wait
 date4=`date +%s`
 let date5=date4-date6
-echo $date5
+echo "解压耗时$date5"
 #合并roles目录
 	cd $SOFT_FILE
 	install_tar=`ls -d install_*`
@@ -257,7 +257,7 @@ echo $date5
 	fi
 	rm -rf $SOFT_FILE/$i
 	done
-
+echo "合并完成"
 #传递ansible.cfg配置文件
 cp $current_path/$info/$ansible_cfg $SOFT_FILE
 cp $current_path/$info/$inventory $SOFT_FILE
