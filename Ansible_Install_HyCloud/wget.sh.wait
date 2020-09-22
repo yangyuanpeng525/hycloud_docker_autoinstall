@@ -205,7 +205,7 @@ done
 wait
 date2=`date +%s`
 let date3=date2-date1
-echo "下载耗时$date3 S"
+echo "下载耗时 $date3 S"
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #本地安装
 #下载主机为ansible控制机
@@ -251,7 +251,7 @@ echo "----------------开始校验md5值，并解压合并-----------------"
 wait
 date4=`date +%s`
 let date5=date4-date6
-echo "校验MD5值并解压耗时$date5 S"
+echo "校验MD5值并解压耗时 $date5 S"
 #合并roles目录
 	cd $SOFT_FILE
 	install_tar=`ls -d install_*`
