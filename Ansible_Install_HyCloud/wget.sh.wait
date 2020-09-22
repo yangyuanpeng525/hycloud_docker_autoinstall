@@ -255,11 +255,12 @@ echo "解压耗时$date5 S"
 	echo $install_tar > /tmp/install_tar
 	for i in `cat /tmp/install_tar`
 	do
-	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE &> /dev/null
+	/usr/bin/cp -r $SOFT_FILE/$i/* $SOFT_FILE #&> /dev/null
 	if [ $? != 0 ] ;then
 		echo "$i合并错误，请联系管理员"
 	fi
 	rm -rf $SOFT_FILE/$i
+	echo $i
 	done
 echo "----------合并完成--------------"
 #传递ansible.cfg配置文件
