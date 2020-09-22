@@ -224,10 +224,11 @@ bash $current_path/$scrips/$ansibletool_install_sh
 	cp $current_path/$file_tmp/*  $SOFT_FILE
 	ls $SOFT_FILE/*.tar.gz > /tmp/tmp-hy
 date6=`date +%s`
+
+echo "----------------开始校验md5值，并解压合并-----------------"
 	for i in `cat /tmp/tmp-hy`
 	do
 
-echo "----------------开始校验md5值，并解压合并-----------------"
 #md5校验，并比较
 {	md5_tmp=`md5sum  $i  |  awk '{print $1}'`
 	md5_true=`cat $i.md5`
