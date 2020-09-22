@@ -268,7 +268,7 @@ echo "校验MD5值并解压耗时 $date5 S"
 echo "----------合并完成--------------"
 #传递ansible.cfg配置文件
 cp $current_path/$info/$ansible_cfg $SOFT_FILE
-cp $current_path/$info/$inventory $SOFT_FILE
+cp $current_path/$info/$inventory $SOFT_FILE/inventory-all
 cp $current_path/$info/$dbinfo $SOFT_FILE
 #删除下载目录
 rm -rf $current_path/$tmp
