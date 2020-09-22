@@ -181,6 +181,7 @@ wget $mysql_python_url -P $current_path/$images_tmp  &> /dev/null
 
 date1=`date +%s`
 
+echo "----------开始下载------------"
 #将版本号和应用拆分，拼接为url并下载安装包
 for app_version  in `cat $current_path/$doc/$install_version`
 do
@@ -189,7 +190,7 @@ do
 	appversion=`echo $app_version | cut -d : -f 2`
 	wget_url=$url/$appname/$appversion/$prefix$appname-$appversion$suffix
 	wget_url_md5=$url/$appname/$appversion/$prefix$appname-$appversion$suffix.md5
-	echo "----------开始下载------------"
+
 	wget $wget_url  -P  $current_path/$file_tmp  &> /dev/null
 	if [ $? != 0 ];then
 	echo "$wget_url下载失败。"
