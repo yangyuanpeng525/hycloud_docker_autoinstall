@@ -21,6 +21,7 @@ SectionDict_trs = {}
 # SectionDict_trs_list = []
 #存放海云应用，基础和trs跑完在跑
 SectionDict_hy = {}
+SectionDict_nginx = {}
 # SectionDict_hy_list = []
 #trs应用列表
 trs_list = ["ids", "mas", "ids_net", "wechat", "trsweibo"]
@@ -116,6 +117,10 @@ def ParseFile(filename=None):
                 if section in trs_list or section in hy_list or "rabbitmq" in section:
                     SectionDict_app_full["nginx"] = SectionDict_app["nginx"]
                     SectionDict_app_full["nginx:vars"] = SectionDict_var["nginx:vars"]
+#将nginx组单独拿出来
+                if "nginx" not in SectionDict_nginx:
+                    SectionDict_nginx["nginx"] = SectionDict_app["nginx"]
+                    SectionDict_nginx["nginx:vars"] = SectionDict_var["nginx:vars"]
 #写入inventory，组名+var组
                 with open(os.path.join("/TRS/ansible-hy", inventory_base), 'w') as f:
                     # f.write(SectionDict_app_full)
@@ -139,14 +144,8 @@ def ParseFile(filename=None):
                         # subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
 #每次执行完ansible-playbook，清空字典，保证每次生成的inventory为干净的inventory
                 SectionDict_app_full.clear()
-#取出trs 海云应用
-    # print(
-    #     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    # print(SectionDict_hy)
-    # print(
-    #     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    # print(SectionDict_hy)
-    # return (SectionDict_trs, SectionDict_hy)
+    SectionDict_app.clear()
+    SectionDict_var.clear()
 
 #trs应用
 def trs_run():
@@ -176,9 +175,9 @@ def trs_run():
         with open(os.path.join("/TRS/ansible-hy", inventory_trs), 'a') as f:
             f.write("[nginx]\n")
             # print(SectionDict_app["nginx"])
-            f.write(":".join(SectionDict_app["nginx"][0]) + "\n")
+            f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
-            f.write("=".join(SectionDict_var["nginx:vars"][0]) + "\n")
+            f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
         # subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
         print("执行命令：ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file))
         # break
@@ -211,9 +210,9 @@ def hy_run():
         with open(os.path.join("/TRS/ansible-hy", inventory_hy), 'a') as f:
             f.write("[nginx]\n")
             # print(SectionDict_app["nginx"])
-            f.write(":".join(SectionDict_app["nginx"][0]) + "\n")
+            f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
-            f.write("=".join(SectionDict_var["nginx:vars"][0]) + "\n")
+            f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
         # subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
         print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy, yaml_file))
         # break
