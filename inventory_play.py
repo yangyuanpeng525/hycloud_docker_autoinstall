@@ -30,8 +30,10 @@ hy_list = ["iip", "igi", "igs", "ipm", "igi_net"]
 trs_num = 0
 #安装所有海云应用的数
 hy_num = 0
-
-#定义函数
+#
+inventory_trs = "inventory-trs"
+inventory_hy = "inventory-hy"
+#定义函数，执行基础
 def ParseFile(filename=None):
     config = configparser.ConfigParser()
     config.read(filename)
@@ -120,6 +122,7 @@ def ParseFile(filename=None):
                         # print(data)
                         f.write("[%s]\n" % data)
                         for value in SectionDict_app_full[data]:
+                            # print(value)
                             # f.write(str(value)+"\n")
                             if ":vars" in data:
                                 f.write("=".join(value)+'\n')
@@ -135,17 +138,80 @@ def ParseFile(filename=None):
                         #subprocess.call("ansible-playbook -i %s  %s" % (inventory, yaml_file), cwd=workpath, shell=True)
 #每次执行完ansible-playbook，清空字典，保证每次生成的inventory为干净的inventory
                 SectionDict_app_full.clear()
+#取出trs 海云应用
+    # print(
+    #     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    # print(SectionDict_hy)
+    # print(
+    #     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    # print(SectionDict_hy)
+    # return (SectionDict_trs, SectionDict_hy)
 
+def trs_run():
+#执行trs
+    print("c" * 100)
+    # print(SectionDict_hy)
+    # print("c" * 100)
+    # print(SectionDict_trs)
+    # SectionDict_trs["nginx"] = SectionDict_app["nginx"]
+    # SectionDict_trs["nginx:vars"] = SectionDict_var["nginx:vars"]
+    for app in SectionDict_trs:
+        # print(SectionDict_trs[app])
+        subprocess.call(">inventory-trs", cwd=workpath, shell=True)
+        for group, groupvalue in SectionDict_trs[app]:
+            # print(group, groupvalue)
+            with open(os.path.join("/TRS/ansible-hy", "inventory-trs"), 'a') as f:
+                f.write("[%s]\n" % group)
+                for i in groupvalue:
+                    if ":var" in group:
+                        f.write("=".join(i) + "\n")
+                    else:
+                        f.write(":".join(i) + "\n")
+            if ":vars" not in group:
+                yaml_file = "install_"+group+".yml"
+                # print(yaml_file)
+#写入nginx组
+        with open(os.path.join("/TRS/ansible-hy", "inventory-trs"), 'a') as f:
+            f.write("[nginx]\n")
+            # print(SectionDict_app["nginx"])
+            f.write(":".join(SectionDict_app["nginx"][0]) + "\n")
+            f.write("[nginx:vars]\n")
+            f.write("=".join(SectionDict_var["nginx:vars"][0]) + "\n")
+        subprocess.call("ansible-playbook -i inventory-trs  %s" % (yaml_file), cwd=workpath, shell=True)
+        # break
 
-    print(
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    print(SectionDict_hy)
-    print(
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    print(SectionDict_hy)
-
-
-
+# def hy_run():
+# #执行trs
+#     print("c" * 100)
+#     # print(SectionDict_hy)
+#     # print("c" * 100)
+#     # print(SectionDict_trs)
+#     # SectionDict_trs["nginx"] = SectionDict_app["nginx"]
+#     # SectionDict_trs["nginx:vars"] = SectionDict_var["nginx:vars"]
+#     for app in SectionDict_hy:
+#         # print(SectionDict_trs[app])
+#         subprocess.call(">%s" % inventory_hy, cwd=workpath, shell=True)
+#         for group, groupvalue in SectionDict_hy[app]:
+#             # print(group, groupvalue)
+#             with open(os.path.join("/TRS/ansible-hy", inventory_hy), 'a') as f:
+#                 f.write("[%s]\n" % group)
+#                 for i in groupvalue:
+#                     if ":var" in group:
+#                         f.write("=".join(i) + "\n")
+#                     else:
+#                         f.write(":".join(i) + "\n")
+#             if ":vars" not in group:
+#                 yaml_file = "install_"+group+".yml"
+#                 # print(yaml_file)
+# #写入nginx组
+#         with open(os.path.join("/TRS/ansible-hy", inventory_hy), 'a') as f:
+#             f.write("[nginx]\n")
+#             # print(SectionDict_app["nginx"])
+#             f.write(":".join(SectionDict_app["nginx"][0]) + "\n")
+#             f.write("[nginx:vars]\n")
+#             f.write("=".join(SectionDict_var["nginx:vars"][0]) + "\n")
+#         subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
+#         # break
 
 if __name__ == "__main__":
 #    subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
@@ -157,6 +223,11 @@ if __name__ == "__main__":
                 continue
             ParseFile(os.path.join("/TRS/yyp/python/tmp", file))
             print(os.path.join("/TRS/yyp/python/tmp", file))
-
-
+    # print("ccccccccccccccccccccccccccccc")
+    # print(SectionDict_hy)
+    # print("ccccccccccccccccccccccccccccc")
+    # print(SectionDict_trs)
+    print("1" * 100)
+    trs_run()
+    # hy_run()
 
