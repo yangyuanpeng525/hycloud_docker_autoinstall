@@ -18,11 +18,11 @@ SectionDict_var = {}
 SectionDict_app_full = {}
 #存放trs应用,基础跑完在跑
 SectionDict_trs = {}
-# SectionDict_trs_list = []
 #存放海云应用，基础和trs跑完在跑
 SectionDict_hy = {}
+#将nginx单独存放
 SectionDict_nginx = {}
-# SectionDict_hy_list = []
+
 #trs应用列表
 trs_list = ["ids", "mas", "ids_net", "wechat", "trsweibo"]
 #hy应用列表
@@ -31,10 +31,13 @@ hy_list = ["iip", "igi", "igs", "ipm", "igi_net"]
 trs_num = 0
 #安装所有海云应用的数
 hy_num = 0
-#
+
+#inventory分类
 inventory_base = "inventory-base"
 inventory_trs = "inventory-trs"
 inventory_hy = "inventory-hy"
+
+
 #定义函数，执行基础
 def ParseFile(filename=None):
     config = configparser.ConfigParser()
@@ -60,48 +63,32 @@ def ParseFile(filename=None):
     for section in SectionDict_app:
 #trs应用后装
         if section in trs_list:
-            # SectionDict_trs[section] = SectionDict_app[section]
-            # SectionDict_trs[section+":vars"] = SectionDict_var[section+":vars"]
             global trs_num
             # global SectionDict_trs
             # global SectionDict_trs_list
             trs_num += 1
-            # print(str(trs_num)+'-----trs')
-            # print(section)
             tmp_trs = (section, SectionDict_app[section])
             tmp_trs_var = (section+":vars", SectionDict_var[section+":vars"])
             SectionDict_trs_list = []
             SectionDict_trs_list.append(tmp_trs)
             SectionDict_trs_list.append(tmp_trs_var)
-            # print(SectionDict_trs_list)
             SectionDict_trs[trs_num] = SectionDict_trs_list
-            # print(trs_num, SectionDict_trs[trs_num])
-            # print("ooooooooo")
-            # print(SectionDict_trs)
             del tmp_trs
             del tmp_trs_var
             # SectionDict_trs_list.clear()
-            # print(trs_num, SectionDict_trs[trs_num])
             continue
 #海云应用后装
         if section in hy_list:
-            # SectionDict_hy[section] = SectionDict_app[section]
-            # SectionDict_hy[section+":vars"] = SectionDict_var[section+":vars"]
             global hy_num
             # global SectionDict_hy
             # global SectionDict_hy_list
             hy_num += 1
-            # print(str(hy_num)+"----hy")
-            # print(section)
             tmp_hy = (section, SectionDict_app[section])
             tmp_hy_var = (section + ":vars", SectionDict_var[section + ":vars"])
             SectionDict_hy_list = []
             SectionDict_hy_list.append(tmp_hy)
             SectionDict_hy_list.append(tmp_hy_var)
             SectionDict_hy[hy_num] = SectionDict_hy_list
-            # print(hy_num,SectionDict_hy_list)
-            # print("oooooooo")
-            # print(SectionDict_hy)
             del tmp_hy
             del tmp_hy_var
             # SectionDict_hy_list.clear()
@@ -141,21 +128,16 @@ def ParseFile(filename=None):
                         yaml_file = "install_"+data+".yml"
                         # print("-" * 20)
                         print("执行命令：ansible-playbook -i %s  %s" % (inventory_base, yaml_file))
-                        # subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
+                        subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
 #每次执行完ansible-playbook，清空字典，保证每次生成的inventory为干净的inventory
                 SectionDict_app_full.clear()
+#清除本次的组名
     SectionDict_app.clear()
     SectionDict_var.clear()
 
 #trs应用
 def trs_run():
 #执行trs
-    # print("c" * 100)
-    # print(SectionDict_hy)
-    # print("c" * 100)
-    # print(SectionDict_trs)
-    # SectionDict_trs["nginx"] = SectionDict_app["nginx"]
-    # SectionDict_trs["nginx:vars"] = SectionDict_var["nginx:vars"]
     for app in SectionDict_trs:
         # print(SectionDict_trs[app])
         subprocess.call(">%s" % inventory_trs, cwd=workpath, shell=True)
@@ -178,19 +160,13 @@ def trs_run():
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
             f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
-        # subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
+        subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
         print("执行命令：ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file))
         # break
 
 #海云应用
 def hy_run():
 #执行hy
-    # print("c" * 100)
-    # print(SectionDict_hy)
-    # print("c" * 100)
-    # print(SectionDict_trs)
-    # SectionDict_trs["nginx"] = SectionDict_app["nginx"]
-    # SectionDict_trs["nginx:vars"] = SectionDict_var["nginx:vars"]
     for app in SectionDict_hy:
         # print(SectionDict_trs[app])
         subprocess.call(">%s" % inventory_hy, cwd=workpath, shell=True)
@@ -213,14 +189,17 @@ def hy_run():
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
             f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
-        # subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
+        subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
         print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy, yaml_file))
         # break
 
+
+#主函数
 if __name__ == "__main__":
+#安装docker
     print("-" * 20 + "开始为所有主机安装docker环境" + "-" * 20)
     print("执行命令：ansible-playbook -i inventory-all install_docker.yml")
-#    subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
+    subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
 
 #拿到目录下的所有文件
     print("-" * 20 + "开始安装基础应用" + "-" * 20)
@@ -230,11 +209,14 @@ if __name__ == "__main__":
             if 'inventory-in-' not in file:
                 continue
             print("读取inventory文件：" + os.path.join(BaseFolder, "tmp", file))
+#调用函数，安装基础
             ParseFile(os.path.join(BaseFolder, "tmp", file))
 
+#trs
     print("-" * 20 +"开始安装trs应用" + "-" * 20)
     trs_run()
 
+#hy
     print("-" * 20 +"开始安装海云应用" + "-" * 20)
     hy_run()
 
