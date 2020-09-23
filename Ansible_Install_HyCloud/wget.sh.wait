@@ -92,6 +92,7 @@ suffix=".tar.gz"
 docker_url="http://d.devdemo.trs.net.cn/apollo/devops/tools/docker-19.03.8.tgz"
 ansible_url="http://d.devdemo.trs.net.cn/apollo/devops/tools/ansible-2.5.1.tar"
 mysql_python_url="http://d.devdemo.trs.net.cn/apollo/devops/tools/MySQL-python-1.2.5-1.el7.x86_64.rpm"
+hymedia_url="http://d.devdemo.trs.net.cn/hy/devops-hy/hymedia/hymedia.tar.gz"
 ansible_tmp="/tmp/ansible_tmp"
 
 
@@ -179,6 +180,7 @@ echo "---------ansible master 主机初始化开始----------"
 wget $docker_url  -P  $current_path/$images_tmp  &> /dev/null
 wget $ansible_url  -P  $current_path/$images_tmp  &> /dev/null
 wget $mysql_python_url -P $current_path/$images_tmp  &> /dev/null
+wget $hymedia_url -P $current_path/$images_tmp  &> /dev/null
 
 
 date1=`date +%s`
@@ -251,6 +253,7 @@ echo "----------------开始校验md5值，并解压合并-----------------"
 }&
 	done
 wait
+tar -zxf $ansible_tmp/hymedia.tar.gz -C $SOFT_FILE
 date4=`date +%s`
 let date5=date4-date6
 echo "校验MD5值并解压耗时 $date5 S"
