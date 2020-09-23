@@ -31,6 +31,7 @@ trs_num = 0
 #安装所有海云应用的数
 hy_num = 0
 #
+inventory_base = "inventory-base"
 inventory_trs = "inventory-trs"
 inventory_hy = "inventory-hy"
 #定义函数，执行基础
@@ -64,8 +65,8 @@ def ParseFile(filename=None):
             # global SectionDict_trs
             # global SectionDict_trs_list
             trs_num += 1
-            print(str(trs_num)+'-----trs')
-            print(section)
+            # print(str(trs_num)+'-----trs')
+            # print(section)
             tmp_trs = (section, SectionDict_app[section])
             tmp_trs_var = (section+":vars", SectionDict_var[section+":vars"])
             SectionDict_trs_list = []
@@ -89,8 +90,8 @@ def ParseFile(filename=None):
             # global SectionDict_hy
             # global SectionDict_hy_list
             hy_num += 1
-            print(str(hy_num)+"----hy")
-            print(section)
+            # print(str(hy_num)+"----hy")
+            # print(section)
             tmp_hy = (section, SectionDict_app[section])
             tmp_hy_var = (section + ":vars", SectionDict_var[section + ":vars"])
             SectionDict_hy_list = []
@@ -116,7 +117,7 @@ def ParseFile(filename=None):
                     SectionDict_app_full["nginx"] = SectionDict_app["nginx"]
                     SectionDict_app_full["nginx:vars"] = SectionDict_var["nginx:vars"]
 #写入inventory，组名+var组
-                with open(os.path.join("/TRS/ansible-hy", "inventory-%s") % section, 'w') as f:
+                with open(os.path.join("/TRS/ansible-hy", inventory_base), 'w') as f:
                     # f.write(SectionDict_app_full)
                     for data in SectionDict_app_full:
                         # print(data)
@@ -131,11 +132,11 @@ def ParseFile(filename=None):
 #匹配对应的playbook，install_XXX.yml,inventory
                 for data in SectionDict_app_full:
                     if ":vars" not in data:
-                        inventory = 'inventory-'+data
+                        # inventory = 'inventory-'+data
                         yaml_file = "install_"+data+".yml"
-                        print("---------------------------------------------------------------------------")
-                        print("执行命令：ansible-playbook -i %s  %s\n" % (inventory, yaml_file))
-                        subprocess.call("ansible-playbook -i %s  %s" % (inventory, yaml_file), cwd=workpath, shell=True)
+                        # print("-" * 20)
+                        print("执行命令：ansible-playbook -i %s  %s" % (inventory_base, yaml_file))
+                        # subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
 #每次执行完ansible-playbook，清空字典，保证每次生成的inventory为干净的inventory
                 SectionDict_app_full.clear()
 #取出trs 海云应用
@@ -150,7 +151,7 @@ def ParseFile(filename=None):
 #trs应用
 def trs_run():
 #执行trs
-    print("c" * 100)
+    # print("c" * 100)
     # print(SectionDict_hy)
     # print("c" * 100)
     # print(SectionDict_trs)
@@ -178,14 +179,14 @@ def trs_run():
             f.write(":".join(SectionDict_app["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
             f.write("=".join(SectionDict_var["nginx:vars"][0]) + "\n")
-        subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
+        # subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
         print("执行命令：ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file))
         # break
 
 #海云应用
 def hy_run():
 #执行hy
-    print("c" * 100)
+    # print("c" * 100)
     # print(SectionDict_hy)
     # print("c" * 100)
     # print(SectionDict_trs)
@@ -213,25 +214,28 @@ def hy_run():
             f.write(":".join(SectionDict_app["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
             f.write("=".join(SectionDict_var["nginx:vars"][0]) + "\n")
-        subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy ,yaml_file), cwd=workpath, shell=True)
-        print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy ,yaml_file))
+        # subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
+        print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy, yaml_file))
         # break
 
 if __name__ == "__main__":
+    print("-" * 20 + "开始为所有主机安装docker环境" + "-" * 20)
+    print("执行命令：ansible-playbook -i inventory-all install_docker.yml")
 #    subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
+
 #拿到目录下的所有文件
-    for TmpBasePath, TmpFolders, TmpFiles in os.walk(os.path.join("/TRS/yyp/Ansible_Install_HyCloud", 'tmp')):
+    print("-" * 20 + "开始安装基础应用" + "-" * 20)
+    for TmpBasePath, TmpFolders, TmpFiles in os.walk(os.path.join(BaseFolder, 'tmp')):
         for file in TmpFiles:
 #找出inventory-in-X配置文件
             if 'inventory-in-' not in file:
                 continue
-            ParseFile(os.path.join("/TRS/yyp/python/tmp", file))
-            print(os.path.join("/TRS/yyp/python/tmp", file))
-    # print("ccccccccccccccccccccccccccccc")
-    # print(SectionDict_hy)
-    # print("ccccccccccccccccccccccccccccc")
-    # print(SectionDict_trs)
-    print("1" * 100)
+            print("读取inventory文件：" + os.path.join(BaseFolder, "tmp", file))
+            ParseFile(os.path.join(BaseFolder, "tmp", file))
+
+    print("-" * 20 +"开始安装trs应用" + "-" * 20)
     trs_run()
+
+    print("-" * 20 +"开始安装海云应用" + "-" * 20)
     hy_run()
 
