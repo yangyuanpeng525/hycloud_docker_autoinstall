@@ -3,8 +3,8 @@ import os
 import configparser
 import subprocess
 
-#workpath = "/TRS/HyCloud_devops"
-workpath = "/TRS/ansible-hy"
+workpath = "/TRS/HyCloud_devops"
+# workpath = "/TRS/ansible-hy"
 
 BaseFolder = os.getcwd()
 
@@ -109,7 +109,7 @@ def ParseFile(filename=None):
                     SectionDict_nginx["nginx"] = SectionDict_app["nginx"]
                     SectionDict_nginx["nginx:vars"] = SectionDict_var["nginx:vars"]
 #写入inventory，组名+var组
-                with open(os.path.join("/TRS/ansible-hy", inventory_base), 'w') as f:
+                with open(os.path.join(workpath, inventory_base), 'w') as f:
                     # f.write(SectionDict_app_full)
                     for data in SectionDict_app_full:
                         # print(data)
@@ -143,7 +143,7 @@ def trs_run():
         subprocess.call(">%s" % inventory_trs, cwd=workpath, shell=True)
         for group, groupvalue in SectionDict_trs[app]:
             # print(group, groupvalue)
-            with open(os.path.join("/TRS/ansible-hy", inventory_trs), 'a') as f:
+            with open(os.path.join(workpath, inventory_trs), 'a') as f:
                 f.write("[%s]\n" % group)
                 for i in groupvalue:
                     if ":var" in group:
@@ -154,7 +154,7 @@ def trs_run():
                 yaml_file = "install_"+group+".yml"
                 # print(yaml_file)
 #写入nginx组
-        with open(os.path.join("/TRS/ansible-hy", inventory_trs), 'a') as f:
+        with open(os.path.join(workpath, inventory_trs), 'a') as f:
             f.write("[nginx]\n")
             # print(SectionDict_app["nginx"])
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
@@ -172,7 +172,7 @@ def hy_run():
         subprocess.call(">%s" % inventory_hy, cwd=workpath, shell=True)
         for group, groupvalue in SectionDict_hy[app]:
             # print(group, groupvalue)
-            with open(os.path.join("/TRS/ansible-hy", inventory_hy), 'a') as f:
+            with open(os.path.join(workpath, inventory_hy), 'a') as f:
                 f.write("[%s]\n" % group)
                 for i in groupvalue:
                     if ":var" in group:
@@ -183,7 +183,7 @@ def hy_run():
                 yaml_file = "install_"+group+".yml"
                 # print(yaml_file)
 #写入nginx组
-        with open(os.path.join("/TRS/ansible-hy", inventory_hy), 'a') as f:
+        with open(os.path.join(workpath, inventory_hy), 'a') as f:
             f.write("[nginx]\n")
             # print(SectionDict_app["nginx"])
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 #安装docker
     print("-" * 20 + "开始为所有主机安装docker环境" + "-" * 20)
     print("执行命令：ansible-playbook -i inventory-all install_docker.yml")
-    subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
+    # subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
 
 #拿到目录下的所有文件
     print("-" * 20 + "开始安装基础应用" + "-" * 20)
