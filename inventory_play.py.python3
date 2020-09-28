@@ -1,7 +1,6 @@
-#!/usr/bin/env python3.6
-# -*- coding:UTF-8 -*-
+#python3
 import os
-import ConfigParser
+import configparser
 import subprocess
 
 workpath = "/TRS/HyCloud_devops"
@@ -23,8 +22,6 @@ SectionDict_trs = {}
 SectionDict_hy = {}
 #将nginx单独存放
 SectionDict_nginx = {}
-#将elasticsearch单独存放
-SectionDict_elasticsearch = {}
 
 #trs应用列表
 trs_list = ["ids", "mas", "ids_net", "wechat", "trsweibo"]
@@ -43,7 +40,7 @@ inventory_hy = "inventory-hy"
 
 #定义函数，执行基础
 def ParseFile(filename=None):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(filename)
     global SectionDict_hy
     global SectionDict_trs
@@ -55,8 +52,6 @@ def ParseFile(filename=None):
     # print(SectionDict)
     for tmp_section in TmpSectionList:
         tmp_section = tmp_section.strip()
-        if "ckm" in tmp_section:
-            continue
         if ":vars" in tmp_section:
             SectionDict_var[tmp_section] = SectionDict[tmp_section]
         else:
@@ -110,15 +105,9 @@ def ParseFile(filename=None):
                     SectionDict_app_full["nginx"] = SectionDict_app["nginx"]
                     SectionDict_app_full["nginx:vars"] = SectionDict_var["nginx:vars"]
 #将nginx组单独拿出来
-                if "nginx" in SectionDict_app:
-                    if "nginx" not in SectionDict_nginx:
-                        SectionDict_nginx["nginx"] = SectionDict_app["nginx"]
-                        SectionDict_nginx["nginx:vars"] = SectionDict_var["nginx:vars"]
-#将elasticsearch组单独拿出来
-                if "elasticsearch" in SectionDict_app:
-                    if "elasticsearch" not in SectionDict_elasticsearch:
-                        SectionDict_elasticsearch["elasticsearch"] = SectionDict_app["elasticsearch"]
-                        SectionDict_elasticsearch["elasticsearch:vars"] = SectionDict_var["elasticsearch:vars"]
+                if "nginx" not in SectionDict_nginx:
+                    SectionDict_nginx["nginx"] = SectionDict_app["nginx"]
+                    SectionDict_nginx["nginx:vars"] = SectionDict_var["nginx:vars"]
 #写入inventory，组名+var组
                 with open(os.path.join(workpath, inventory_base), 'w') as f:
                     # f.write(SectionDict_app_full)
@@ -139,16 +128,12 @@ def ParseFile(filename=None):
                         yaml_file = "install_"+data+".yml"
                         # print("-" * 20)
                         print("执行命令：ansible-playbook -i %s  %s" % (inventory_base, yaml_file))
-                        base_result = subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
-                        if base_result != 0:
-                            exit(2)
-                            return 2
+                        subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
 #每次执行完ansible-playbook，清空字典，保证每次生成的inventory为干净的inventory
                 SectionDict_app_full.clear()
 #清除本次的组名
     SectionDict_app.clear()
     SectionDict_var.clear()
-    # return 0
 
 #trs应用
 def trs_run():
@@ -175,12 +160,8 @@ def trs_run():
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
             f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
-            print("执行命令：ansible-playbook -i %s  %s" % (inventory_trs, yaml_file))
-        trs_result = subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
-        if trs_result != 0:
-            exit(2)
-            return 2
-    # return 0
+        subprocess.call("ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file), cwd=workpath, shell=True)
+        print("执行命令：ansible-playbook -i %s  %s" % (inventory_trs ,yaml_file))
         # break
 
 #海云应用
@@ -198,11 +179,6 @@ def hy_run():
                         f.write("=".join(i) + "\n")
                     else:
                         f.write(":".join(i) + "\n")
-                if "iip:vars" in group:
-                    f.write("[elasticsearch]\n")
-                    f.write(":".join(SectionDict_elasticsearch["elasticsearch"][0]) + "\n")
-                    f.write("[elasticsearch:vars]\n")
-                    f.write("=".join(SectionDict_elasticsearch["elasticsearch:vars"][0]) + "\n")
             if ":vars" not in group:
                 yaml_file = "install_"+group+".yml"
                 # print(yaml_file)
@@ -213,12 +189,8 @@ def hy_run():
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             f.write("[nginx:vars]\n")
             f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
-            print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy, yaml_file))
-        hy_result = subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
-        if hy_result != 0:
-            exit(2)
-            return 2
-    # return 0
+        subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
+        print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy, yaml_file))
         # break
 
 
@@ -227,10 +199,7 @@ if __name__ == "__main__":
 #安装docker
     print("-" * 20 + "开始为所有主机安装docker环境" + "-" * 20)
     print("执行命令：ansible-playbook -i inventory-all install_docker.yml")
-    docker_result = subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
-    if docker_result != 0:
-        print("docker_result:" + str(docker_result))
-        exit(2)
+    # subprocess.call("ansible-playbook -i inventory-all install_docker.yml", cwd=workpath, shell=True)
 
 #拿到目录下的所有文件
     print("-" * 20 + "开始安装基础应用" + "-" * 20)
@@ -242,11 +211,6 @@ if __name__ == "__main__":
             print("读取inventory文件：" + os.path.join(BaseFolder, "tmp", file))
 #调用函数，安装基础
             ParseFile(os.path.join(BaseFolder, "tmp", file))
-            # ParseFile(os.path.join(BaseFolder, "tmp", file))
-            # if result != 0:
-            #     print("result:" + str(result))
-            #     exit(2)
-
 
 #trs
     print("-" * 20 +"开始安装trs应用" + "-" * 20)
