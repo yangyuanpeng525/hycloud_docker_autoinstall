@@ -78,6 +78,8 @@ with open(os.path.join(BaseFolder, 'tmp', 'all-inventory'), mode='w') as f:
 
 subprocess.call('rm -f Ansible_Install_HyCloud/info/inventory',shell=True)
 subprocess.call('rm -f Ansible_Install_HyCloud/info/dbinfo.yml',shell=True)
+subprocess.call('rm -f host_check/all-inventory',shell=True)
+subprocess.call('cp tmp/all-inventory  host_check/',shell=True)
 
 subprocess.call('cp tmp/dbinfo.yml Ansible_Install_HyCloud/info/', shell=True)
 subprocess.call('cp tmp/all-inventory Ansible_Install_HyCloud/info/inventory', shell=True)
