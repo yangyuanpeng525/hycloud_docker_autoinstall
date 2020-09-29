@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding:UTF-8 -*-
+
 import os
 import ConfigParser
 import subprocess
@@ -120,7 +121,7 @@ def ParseFile(filename=None):
                         SectionDict_elasticsearch["elasticsearch"] = SectionDict_app["elasticsearch"]
                         SectionDict_elasticsearch["elasticsearch:vars"] = SectionDict_var["elasticsearch:vars"]
 #写入inventory，组名+var组
-                with open(os.path.join(workpath, inventory_base), 'w') as f:
+                with open(os.path.join(workpath, "inventory_"+"%s") % section, 'w') as f:
                     # f.write(SectionDict_app_full)
                     for data in SectionDict_app_full:
                         # print(data)
@@ -138,8 +139,8 @@ def ParseFile(filename=None):
                         # inventory = 'inventory-'+data
                         yaml_file = "install_"+data+".yml"
                         # print("-" * 20)
-                        print("执行命令：ansible-playbook -i %s  %s" % (inventory_base, yaml_file))
-                        base_result = subprocess.call("ansible-playbook -i %s  %s" % (inventory_base, yaml_file), cwd=workpath, shell=True)
+                        print("执行命令：ansible-playbook -i inventory_%s %s" % (section, yaml_file))
+                        base_result = subprocess.call("ansible-playbook -i inventory_%s  %s" % (section, yaml_file), cwd=workpath, shell=True)
                         if base_result != 0:
                             exit(2)
                             return 2
@@ -201,8 +202,8 @@ def hy_run():
                 if "iip:vars" in group:
                     f.write("[elasticsearch]\n")
                     f.write(":".join(SectionDict_elasticsearch["elasticsearch"][0]) + "\n")
-                    f.write("[elasticsearch:vars]\n")
-                    f.write("=".join(SectionDict_elasticsearch["elasticsearch:vars"][0]) + "\n")
+                    # f.write("[elasticsearch:vars]\n")
+                    # f.write("=".join(SectionDict_elasticsearch["elasticsearch:vars"][0]) + "\n")
             if ":vars" not in group:
                 yaml_file = "install_"+group+".yml"
                 # print(yaml_file)
@@ -211,8 +212,8 @@ def hy_run():
             f.write("[nginx]\n")
             # print(SectionDict_app["nginx"])
             f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
-            f.write("[nginx:vars]\n")
-            f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
+            # f.write("[nginx:vars]\n")
+            # f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
             print("执行命令：ansible-playbook -i %s  %s" % (inventory_hy, yaml_file))
         hy_result = subprocess.call("ansible-playbook -i %s  %s" % (inventory_hy, yaml_file), cwd=workpath, shell=True)
         if hy_result != 0:
