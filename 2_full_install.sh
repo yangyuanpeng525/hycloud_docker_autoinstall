@@ -14,9 +14,9 @@ if [ $? != 0 ];then
 fi
 #检测
 cd $current_path/host_check;ansible-playbook -i all-inventory  play.yaml
-#if [ $? != 0 ];then
-#        exit 2
-#fi
+if [ $? != 0 ];then
+        exit 2
+fi
 
 
 #下载
