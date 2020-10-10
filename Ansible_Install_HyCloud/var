@@ -1,7 +1,0 @@
-#定义下载地址
-url=http://d.devdemo.trs.net.cn/hy/devops-hy
-
-#定义ansible master主机ansible执行目录
-#默认，可修改
-SOFT_FILE=/TRS/HyCloud_devops
-#SOFT_FILE=/TRS/ansible-hy
