@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+
+<h1>服务器端口检测报告</h1>
+
+<table>
+  <tr>
+    <th>源IP</th>
+    <th>目标IP</th>
+    <th>目标端口</th>
+    <th>检测结果</th>
+  </tr>
+   {replace_me_here}
+</table>
+
+</body>
+</html>
+

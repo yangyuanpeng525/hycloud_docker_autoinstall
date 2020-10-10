@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#合并roles目录
+	cd $SOFT_FILE
+	install_tar=`ls -d install_*`
+	echo $install_tar > /tmp/install_tar
+	for  i in `cat /tmp/install_tar`
+	do
+		cp -r $SOFT_FILE/$i/* $SOFT_FILE
+		rm -rf $SOFT_FILE/$i
+	done 

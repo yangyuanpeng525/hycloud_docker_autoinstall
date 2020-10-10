@@ -1,0 +1,132 @@
+[iip:vars]
+server_type=app
+cpu=1
+mem=2
+disk=20
+io=10
+
+[nginx:vars]
+server_type=bigdata
+cpu=1
+mem=2
+disk=20
+io=10
+
+[elasticsearch:vars]
+server_type=memory
+cpu=1
+mem=2
+disk=20
+io=10
+
+[ipm]
+192.168.118.204:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[mariadb:vars]
+server_type=database
+cpu=1
+mem=2
+disk=20
+io=10
+
+[ids:vars]
+server_type=app
+cpu=1
+mem=2
+disk=20
+io=10
+
+[igs:vars]
+server_type=app
+cpu=1
+mem=2
+disk=20
+io=10
+
+[redis:vars]
+server_type=memory
+cpu=1
+mem=2
+disk=20
+io=10
+
+[igs]
+192.168.118.206:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[rabbitmq:vars]
+server_type=memory
+cpu=1
+mem=2
+disk=20
+io=10
+
+[redis]
+192.168.118.203:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[ckm:vars]
+server_type=compute
+cpu=1
+mem=2
+disk=20
+io=10
+
+[igi]
+192.168.118.203:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[mas]
+192.168.118.205:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[iip]
+192.168.118.205:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[mas:vars]
+server_type=bigdata
+cpu=1
+mem=2
+disk=20
+io=10
+
+[nginx]
+192.168.118.201:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[mariadb]
+192.168.118.206:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[logstash]
+
+[ckm]
+192.168.118.205:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[zabbix:vars]
+server_type=app
+cpu=1
+mem=2
+disk=20
+io=10
+
+[ipm:vars]
+server_type=app
+cpu=1
+mem=2
+disk=20
+io=10
+
+[ids]
+192.168.118.204:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[rabbitmq]
+192.168.118.203:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[zabbix]
+192.168.118.202:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[elasticsearch]
+192.168.118.202:22 ansible_ssh_user=root ansible_ssh_pass=redhat
+
+[igi:vars]
+server_type=app
+cpu=1
+mem=2
+disk=20
+io=10
+

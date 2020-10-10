@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+
+<h1>服务器检测报告</h1>
+
+<table>
+  <tr>
+    <th>服务器 IP</th>
+    <th>整体检测结果</th>
+    <th>检测项</th>
+    <th>预期值</th>
+    <th>实际值</th>
+    <th>单项结果</th>
+    <th>检测项</th>
+    <th>预期值</th>
+    <th>实际值</th>
+    <th>单项结果</th>
+    <th>检测项</th>
+    <th>预期值</th>
+    <th>实际值</th>
+    <th>单项结果</th>
+    <th>检测项</th>
+    <th>预期值</th>
+    <th>实际值</th>
+    <th>单项结果</th>
+    <th>检测项</th>
+    <th>预期值</th>
+    <th>实际值</th>
+    <th>单项结果</th>
+  </tr>
+   {replace_me_here}
+</table>
+
+</body>
+</html>
+
