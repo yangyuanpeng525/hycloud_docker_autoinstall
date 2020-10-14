@@ -1,0 +1,101 @@
+- name: "创建临时目录"
+  file:
+    path: "{{ playbook_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - tmp
+    - report
+  ignore_errors: true
+  run_once: true
+  delegate_to: 127.0.0.1
+
+- name: "清空历史文件"
+  shell: "rm -f -r {{ playbook_dir }}/tmp/.*hardware.*;rm -f -r {{ playbook_dir }}/report/hardware.*"
+  delegate_to: 127.0.0.1
+  ignore_errors: true
+  run_once: true
+
+
+- name: '运行服务器检测脚本'
+  shell:
+    chdir: /tmp
+    cmd: "sh ./hardware_check.sh {{ ansible_host }} {{ hostvars[inventory_hostname]['cpu'] }} {{ hostvars[inventory_hostname]['mem'] }} {{ hostvars[inventory_hostname]['disk'] }} {{ hostvars[inventory_hostname]['io'] }}"
+
+- name: "收集服务器检查日志"
+  fetch: 
+    src: "/tmp/{{ ansible_host | replace('.','_') }}_hardware_check_result.log" 
+    dest: "{{ playbook_dir }}/tmp/"
+    flat: yes
+    
+#- stat:
+#    path: "{{ playbook_dir }}/tmp/failed_ssh_host.log"
+#  register: p
+#  delegate_to: 127.0.0.1
+#  run_once: true
+#
+#- name: "打印无法SSH 连接的主机"
+#  debug:
+#    msg: "无法SSH连接主机：{{ item }}"
+#  with_lines:  "[[ -f {{ playbook_dir }}/tmp/failed_ssh_host.log  ]] && cat {{ playbook_dir }}/tmp/failed_ssh_host.log||echo '无'"
+#  run_once: true
+#  changed_when: true
+#
+#- fail:
+#    msg: "部分主机无法 SSH 连接,工具无法继续执行"
+#  when: p.stat.exists  and not  p.stat.isdir
+#  run_once: true
+#
+#- name: "清空无效文件"
+#  local_action: file path=./tmp/groupname_2_hosts.log state=absent
+#  ignore_errors: true
+#  run_once: true
+#
+#- name: "创建临时目录"
+#  local_action: file path=./tmp state=directory
+#
+#- name: "遍历当前GROUPS"
+#  run_once: true
+#  include_tasks: write_to_file.yaml
+#  with_dict: "{{ groups }}"
+#  loop_control:
+#     loop_var: group
+#  when:  (group.key  != "ungrouped") and (group.key  != "all")
+#
+#- file:
+#    path: "{{ role_path }}/files/generate_port_check.py"
+#    state: file
+#    mode: '0777'
+#  run_once: true
+#  delegate_to: 127.0.0.1
+#
+#- name: "调用python script"
+#  run_once: true
+#  command: ./generate_port_check.py
+#  args:
+#    chdir: "{{ role_path }}/files"
+#  delegate_to: 127.0.0.1
+#
+#- name: "拷贝脚本至目标服务器"
+#  copy:
+#    src: "{{ item }}"
+#    dest: "/tmp"
+#  with_items:
+#     - check_port.sh
+#     - "{{ playbook_dir }}/tmp/host_listening_ports.txt"
+#     - "{{ playbook_dir }}/tmp/port_check_list.txt"
+#     - start_test_services.py
+#
+#- name: "修改脚本文件权限"
+#  file:
+#    path: "/tmp/{{ item }}"
+#    state: file
+#    mode: '0777'
+#  with_items:
+#     - check_port.sh
+#     - start_test_services.py
+#
+#- name: '启动端口监听程序'
+#  shell: "(cd /tmp/;python2 start_test_services.py {{ ansible_host }} >/dev/null 2>&1 &)"
+#  async: 10
+#  poll: 0
+#  ignore_errors: true 
