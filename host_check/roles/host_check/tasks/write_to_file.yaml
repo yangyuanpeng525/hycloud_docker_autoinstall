@@ -1,3 +1,0 @@
-- name: "write to file"
-  local_action: lineinfile line="{{ group.key }} {{ item }}" path=./tmp/groupname_2_hosts.log state=present create=yes
-  loop: "{{ group.value }}"
