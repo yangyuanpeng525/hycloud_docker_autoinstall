@@ -140,8 +140,10 @@ def ParseFile(filename=None):
 # 匹配对应的playbook，install_XXX.yml,inventory
 # 先跑mariadb
                 for data in SectionDict_app_full:
+                    #此处包含了所有mariadb相关的组
                     if "mariadb" in data:
                         continue
+                    #此处包含了所有nginx相关的组
                     if "nginx" in data:
                         continue
                     if ":vars" not in data:
