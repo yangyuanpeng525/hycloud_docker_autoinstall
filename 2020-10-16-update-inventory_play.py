@@ -73,23 +73,19 @@ def ParseFile(filename=None):
             SectionDict_var[tmp_section] = SectionDict[tmp_section]
         else:
             SectionDict_app[tmp_section] = SectionDict[tmp_section]
-    print("inventory分类完成")
+    print(filename + "分类完成")
 
 #基础中需要先安装
     for base_app in base_first_run:
         if base_app in SectionDict_app:
             run_first(group=base_app)
-            # if "nginx" not in base_app:
-            #     SectionDict_app.pop(base_app)
-
-    # 取出组名
+# 取出组名
     for section in SectionDict_app:
         # trs应用后装
         if section in trs_list:
             global trs_num
             trs_num += 1
             tmp_trs = (section, SectionDict_app[section])
-            tmp_trs_var = (section + ":vars", SectionDict_var[section + ":vars"])
             SectionDict_trs_list = []
             SectionDict_trs_list.append(tmp_trs)
             SectionDict_trs[trs_num] = SectionDict_trs_list
