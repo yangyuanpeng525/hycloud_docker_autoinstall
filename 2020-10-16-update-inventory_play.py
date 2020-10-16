@@ -6,7 +6,6 @@ import ConfigParser
 import subprocess
 
 workpath = "/TRS/HyCloud_devops"
-# workpath = "/TRS/ansible-hy"
 
 BaseFolder = os.getcwd()
 
@@ -39,27 +38,17 @@ trs_num = 0
 # 安装所有海云应用的数
 hy_num = 0
 
-# inventory分类
-# inventory_base = "inventory-base"
-# inventory_trs = "inventory-trs"
-# inventory_hy = "inventory-hy"
-
-
 # 先执行mariadb，nginx
 
 def run_first(group=None):
     with open(os.path.join(workpath, "inventory_%s") % (group), 'w') as f:
         f.write("[" + group + "]" + "\n")
         f.write(":".join(SectionDict_app[group][0]) + '\n')
-        # f.write(SectionDict_app["mariadb"])
-        # SectionDict_app.pop(group)
     print("执行命令：ansible-playbook -i inventory_%s install_%s.yml" % (group, group))
     result = subprocess.call("ansible-playbook -i inventory_%s install_%s.yml" % (group, group), cwd=workpath,
                                      shell=True)
     if result != 0:
         exit(2)
-        # return group
-
 
 # 定义函数，执行基础
 def ParseFile(filename=None):
@@ -69,18 +58,12 @@ def ParseFile(filename=None):
     global SectionDict_trs
 
     TmpSectionList = config.sections()
-    # print(TmpSectionList)
+
     for all_section in TmpSectionList:
         SectionDict[all_section] = config.items(all_section)
-    # print(SectionDict)
+
     for tmp_section in TmpSectionList:
         tmp_section = tmp_section.strip()
-        # if tmp_section == "mariadb":
-        #     print(tmp_section)
-        #     print("*" * 100)
-        # if tmp_section == "redis":
-        # print(tmp_section)
-        # print("*" * 100)
 
         if "ckm" in tmp_section:
             continue
@@ -89,96 +72,41 @@ def ParseFile(filename=None):
         if ":vars" in tmp_section:
             SectionDict_var[tmp_section] = SectionDict[tmp_section]
         else:
-            # print(section)
-            # print(SectionDict[section])
             SectionDict_app[tmp_section] = SectionDict[tmp_section]
     print("inventory分类完成")
-    # print(SectionDict_app)
-    # print(SectionDict_var)
 
-    # 先取出数据库
-
-    # if "mariadb" in SectionDict_app:
-        # with open(os.path.join(workpath, "inventory_mariadb"), 'w') as f:
-        #     f.write("[mariadb]" + "\n")
-        #     f.write(":".join(SectionDict_app["mariadb"][0]) + '\n')
-        #     # f.write(SectionDict_app["mariadb"])
-        #     SectionDict_app.pop("mariadb")
-        # print("执行命令：ansible-playbook -i inventory_mariadb install_mariadb.yml")
-        # mariadb_result = subprocess.call("ansible-playbook -i inventory_mariadb install_mariadb.yml ", cwd=workpath, shell=True)
-        # if mariadb_result != 0:
-        #     exit(2)
-        #     return "mariadb"
-        # run_first(group="mariadb")
-        # SectionDict_app.pop("mariadb")
-
-
-    # 安装nginx
-    # if "nginx" in SectionDict_app:
-        # with open(os.path.join(workpath, "inventory_nginx"), 'w') as f:
-        #     f.write("[nginx]" + "\n")
-        #     f.write(":".join(SectionDict_app["nginx"][0]) + '\n')
-        #     # f.write(SectionDict_app["mariadb"])
-        #     # SectionDict_app.pop("mariadb")
-        # print("执行命令：ansible-playbook -i inventory_nginx install_nginx.yml")
-        # nginx_result = subprocess.call("ansible-playbook -i inventory_nginx install_nginx.yml ", cwd=workpath, shell=True)
-        # if nginx_result != 0:
-        #     exit(2)
-        #     return "nginx"
-        # run_first(group="nginx")
+#基础中需要先安装
     for base_app in base_first_run:
         if base_app in SectionDict_app:
             run_first(group=base_app)
-            if "nginx" not in base_app:
-                SectionDict_app.pop(base_app)
-
+            # if "nginx" not in base_app:
+            #     SectionDict_app.pop(base_app)
 
     # 取出组名
     for section in SectionDict_app:
-        # if section == "mariadb":
-        #     print(section)
-        #     print("-" * 100)
-        # if section == "redis":
-        # print("组名-" + section)
-        # print("-" * 100)
-        # print("组名")
         # trs应用后装
         if section in trs_list:
             global trs_num
-            # global SectionDict_trs
-            # global SectionDict_trs_list
             trs_num += 1
             tmp_trs = (section, SectionDict_app[section])
             tmp_trs_var = (section + ":vars", SectionDict_var[section + ":vars"])
             SectionDict_trs_list = []
             SectionDict_trs_list.append(tmp_trs)
-            # SectionDict_trs_list.append(tmp_trs_var)
             SectionDict_trs[trs_num] = SectionDict_trs_list
             del tmp_trs
-            # del tmp_trs_var
-            # SectionDict_trs_list.clear()
             continue
         # 海云应用后装
         if section in hy_list:
             global hy_num
-            # global SectionDict_hy
-            # global SectionDict_hy_list
             hy_num += 1
             tmp_hy = (section, SectionDict_app[section])
-            tmp_hy_var = (section + ":vars", SectionDict_var[section + ":vars"])
             SectionDict_hy_list = []
             SectionDict_hy_list.append(tmp_hy)
-            # SectionDict_hy_list.append(tmp_hy_var)
             SectionDict_hy[hy_num] = SectionDict_hy_list
             del tmp_hy
-            # del tmp_hy_var
-            # SectionDict_hy_list.clear()
             continue
-        # 取出：var组名
+# 取出：var组名
         for section_var in SectionDict_var:
-            # print("组名-" + section)
-            # print("-" * 100)
-            # 组名与vars匹配，通过进行下一步
             if section + ":vars" == section_var:
                 # 拿到组名对应的vars
                 SectionDict_app_full[section] = SectionDict_app[section]
@@ -188,8 +116,6 @@ def ParseFile(filename=None):
                     SectionDict_app_full["nginx"] = SectionDict_app["nginx"]
                     SectionDict_app_full["nginx:vars"] = SectionDict_var["nginx:vars"]
                 # 将nginx组单独拿出来
-                # if section == "nginx":
-                #     print("A" * 100)
                     if "nginx" not in SectionDict_nginx:
                         SectionDict_nginx["nginx"] = SectionDict_app["nginx"]
                         SectionDict_nginx["nginx:vars"] = SectionDict_var["nginx:vars"]
@@ -201,66 +127,47 @@ def ParseFile(filename=None):
                     if "elasticsearch" not in SectionDict_elasticsearch:
                         SectionDict_elasticsearch["elasticsearch"] = SectionDict_app["elasticsearch"]
                         SectionDict_elasticsearch["elasticsearch:vars"] = SectionDict_var["elasticsearch:vars"]
-
                 if "elasticsearch_cluster" in SectionDict_app:
                     if "elasticsearch_cluster" not in SectionDict_elasticsearch:
                         SectionDict_elasticsearch["elasticsearch_cluster"] = SectionDict_app["elasticsearch_cluster"]
                         SectionDict_elasticsearch["elasticsearch_cluster:vars"] = SectionDict_var["elasticsearch_cluster:vars"]
                 # 写入inventory，组名+var组
                 with open(os.path.join(workpath, "inventory_" + "%s") % section, 'w') as f:
-                    # if section == "nginx":
-                    #     print("写入nginx" + "S" * 100)
-                    #     print(SectionDict_app_full)
-                    # f.write(SectionDict_app_full)
                     for data in SectionDict_app_full:
-                        # print(data)
                         f.write("[%s]\n" % data)
                         for value in SectionDict_app_full[data]:
-                            # print(value)
-                            # f.write(str(value)+"\n")
                             if ":vars" in data:
                                 f.write("=".join(value) + '\n')
                             else:
                                 f.write(":".join(value) + '\n')
-                # 匹配对应的playbook，install_XXX.yml,inventory
-                # 先跑mariadb
 
+# 匹配对应的playbook，install_XXX.yml,inventory
+# 先跑mariadb
                 for data in SectionDict_app_full:
-                    if data == "mariadb":
-                        # print("a" * 100)
+                    if "mariadb" in data:
                         continue
-                    if data == "nginx":
-                        # print("a" * 100)
+                    if "nginx" in data:
                         continue
                     if ":vars" not in data:
-                        # inventory = 'inventory-'+data
-                        # print(data, "-" * 100)
-
                         yaml_file = "install_" + data + ".yml"
-                        # print("-" * 20)
                         print("执行命令：ansible-playbook -i inventory_%s %s" % (data, yaml_file))
                         base_result = subprocess.call("ansible-playbook -i inventory_%s  %s" % (data, yaml_file),
                                                       cwd=workpath, shell=True)
                         if base_result != 0:
                             exit(2)
-                            # return data
                 # 每次执行完ansible-playbook，清空字典，保证每次生成的inventory为干净的inventory
                 SectionDict_app_full.clear()
-    # 清除本次的组名
+    # 清除本次inventory-in-X的组名
     SectionDict_app.clear()
     SectionDict_var.clear()
-    # return 0
 
 
 # trs应用
 def trs_run():
     # 执行trs
     for app in SectionDict_trs:
-        # print(SectionDict_trs[app])
-        # subprocess.call(">%s" % inventory_trs, cwd=workpath, shell=True)
         for group, groupvalue in SectionDict_trs[app]:
-            # print(group, groupvalue)
-            with open(os.path.join(workpath, "inventory_trs_" + group ), 'a') as f:
+            with open(os.path.join(workpath, "inventory_trs_" + group), 'a') as f:
                 f.write("[%s]\n" % group)
                 for i in groupvalue:
                     if ":var" in group:
@@ -269,45 +176,29 @@ def trs_run():
                         f.write(":".join(i) + "\n")
             if ":vars" not in group:
                 yaml_file = "install_" + group + ".yml"
-                # print(yaml_file)
+
         # 写入nginx组
         with open(os.path.join(workpath, "inventory_trs_" + group), 'a') as f:
             if group == "ids_net":
                 f.write("[nginx_net]\n")
-                # print(SectionDict_app["nginx"])
                 f.write(":".join(SectionDict_nginx_net["nginx_net"][0]) + "\n")
-                f.write("[nginx:vars]\n")
-                f.write("=".join(SectionDict_nginx_net["nginx_net:vars"][0]) + "\n")
             else:
                 f.write("[nginx]\n")
-                # print(SectionDict_app["nginx"])
                 f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
-                f.write("[nginx:vars]\n")
-                f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
             print("执行命令：ansible-playbook -i %s  %s" % ("inventory_trs_" + group, yaml_file))
         trs_result = subprocess.call("ansible-playbook -i %s  %s" % ("inventory_trs_" + group, yaml_file), cwd=workpath,
                                      shell=True)
         if trs_result != 0:
             exit(2)
-            # return group
-    # return 0
-    # break
-
 
 # 海云应用
 def hy_run():
     # 执行hy
     for app in SectionDict_hy:
-        # print(SectionDict_trs[app])
-        # subprocess.call(">%s" % inventory_hy, cwd=workpath, shell=True)
         for group, groupvalue in SectionDict_hy[app]:
-            # print(group, groupvalue)
             with open(os.path.join(workpath, "inventory_hy_" + group), 'a') as f:
                 f.write("[%s]\n" % group)
                 for i in groupvalue:
-                    # if ":var" in group:
-                    #     f.write("=".join(i) + "\n")
-                    # else:
                     f.write(":".join(i) + "\n")
                 if "iip" in group:
                     if "elasticsearch" in SectionDict_elasticsearch:
@@ -316,31 +207,19 @@ def hy_run():
                     elif "elasticsearch_cluster" in SectionDict_elasticsearch:
                         f.write("[elasticsearch_cluster]\n")
                         f.write(":".join(SectionDict_elasticsearch["elasticsearch_cluster"][0]) + "\n")
-                    # f.write("[elasticsearch:vars]\n")
-                    # f.write("=".join(SectionDict_elasticsearch["elasticsearch:vars"][0]) + "\n")
-            # if ":vars" not in group:
                 yaml_file = "install_" + group + ".yml"
-                # print(yaml_file)
-        # 写入nginx组
+# 写入nginx组
         with open(os.path.join(workpath, "inventory_hy_" + group), 'a') as f:
             if group == "igi_net":
                 f.write("[nginx_net]\n")
-                # print(SectionDict_app["nginx"])
                 f.write(":".join(SectionDict_nginx_net["nginx_net"][0]) + "\n")
-                # f.write("[nginx:vars]\n")
-                # f.write("=".join(SectionDict_nginx["nginx:vars"][0]) + "\n")
             else:
                 f.write("[nginx]\n")
-                # print(SectionDict_app["nginx"])
                 f.write(":".join(SectionDict_nginx["nginx"][0]) + "\n")
             print("执行命令：ansible-playbook -i %s  %s" % ("inventory_hy_" + group, yaml_file))
         hy_result = subprocess.call("ansible-playbook -i %s  %s" % ("inventory_hy_" + group, yaml_file), cwd=workpath, shell=True)
         if hy_result != 0:
             exit(2)
-            # return group
-    # return 0
-    # break
-
 
 # 主函数
 if __name__ == "__main__":
@@ -362,16 +241,11 @@ if __name__ == "__main__":
             print("读取inventory文件：" + os.path.join(BaseFolder, "tmp", file))
             # 调用函数，安装基础
             ParseFile(os.path.join(BaseFolder, "tmp", file))
-            # ParseFile(os.path.join(BaseFolder, "tmp", file))
-            # if result != 0:
-            #     print("result:" + str(result))
-            #     exit(2)
-
-    # trs
+# TRS
     print("-" * 20 + "开始安装trs应用" + "-" * 20)
     trs_run()
 
-    # hy
+# HyCloud
     print("-" * 20 + "开始安装海云应用" + "-" * 20)
     hy_run()
 
