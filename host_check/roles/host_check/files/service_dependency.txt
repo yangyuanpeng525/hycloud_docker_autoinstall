@@ -1,0 +1,241 @@
+#应用依赖列表+端口
+#采编模块IIP依赖
+iip 		nginx 			80
+iip 		nginx-cluster 		80
+iip-cluster 	nginx			80
+iip-cluster 	nginx-cluster		80
+
+iip 		redis 			6379
+iip 		redis-master 		6379
+iip 		redis-slave		6379
+iip-cluster 	redis 			6379
+iip-cluster 	redis-master 		6379
+iip-cluster 	redis-slave 		6379
+
+iip 		rabbitmq		5672
+iip 		rabbitmq-cluster	5672
+iip-cluster 	rabbitmq		5672
+iip-cluster 	rabbitmq-cluster	5672
+
+
+iip 		zabbix  		88 
+iip 		zabbix-cluster  	88 
+iip-cluster 	zabbix  		88 
+iip-cluster 	zabbix-cluster  	88 
+
+
+iip 		ids     		80
+iip 		ids-cluster     	80
+iip-cluster	ids     		80
+iip-cluster 	ids-cluster     	80
+
+
+
+iip 		mas     		80
+iip 		mas-cluster     	80
+iip-cluster 	mas     		80
+iip-cluster 	mas-cluster     	80
+
+
+
+iip 		ckm			80 
+iip 		ckm-cluster		80 
+iip-cluster 	ckm			80 
+iip-cluster 	ckm-cluster		80 
+
+
+
+
+iip 		wechat			80
+iip 		wechat-cluster		80
+iip-cluster 	wechat			80
+iip-cluster 	wechat-cluster		80
+
+
+
+
+iip 		mariadb			3306
+iip 		mariadb_master		3306
+iip-cluster 	mariadb			3306
+iip-cluster 	mariadb_master		3306
+
+
+iip 		elasticsearch		9200	
+iip 		elasticsearch		9300
+iip 		elasticsearch-cluster	9200	
+iip 		elasticsearch-cluster	9300
+iip-cluster 	elasticsearch		9200	
+iip-cluster 	elasticsearch		9300
+iip-cluster 	elasticsearch-cluster	9200	
+iip-cluster 	elasticsearch-cluster	9300
+
+
+
+iip 		igi			80
+iip 		igi-cluster		80
+iip-cluster 	igi			80
+iip-cluster 	igi-cluster		80
+
+iip 		ipm			80
+iip 		ipm-cluster		80
+iip-cluster 	ipm			80
+iip-cluster 	ipm-cluster		80
+
+iip 		nginx			80
+iip 		nginx-cluster		80
+iip-cluster 	nginx			80
+iip-cluster	nginx-cluster		80
+
+#IGI
+igi 		mariadb			3306
+igi 		mariadb_master		3306
+igi-cluster 	mariadb			3306
+igi-cluster 	mariadb_master		3306
+
+igi 		ids			80
+igi 		ids-cluster		80
+igi-cluster 	ids			80
+igi-cluster	ids-cluster		80
+
+igi 		nginx			80
+igi 		nginx-cluster		80
+igi-cluster 	nginx			80
+igi-cluster 	nginx			80
+
+
+igi 		redis			6379
+igi 		redis-cluster		6379
+igi-cluster 	redis			6379
+igi-cluster 	redis			6379
+
+igi 		rabbitmq		5672
+igi 		rabbitmq-cluster	5672
+igi-cluster 	rabbitmq		5672
+igi-cluster 	rabbitmq-cluster	5672
+
+igi		nginx			80
+igi		nginx-cluster		80
+igi-cluster	nginx			80
+igi-cluster	nginx-cluster		80
+
+#IGS
+igs		igs			9200 	
+igs		igs			9300 #本地es
+igs		igs-cluster		9200 	
+igs		igs-cluster		9300 #本地es
+igs-cluster	igs			9200 	
+igs-cluster	igs			9300 #本地es
+igs-cluster	igs-cluster		9200 	
+igs-cluster	igs-cluster		9300 #本地es
+
+igs		rabbitmq		5672	
+igs		rabbitmq-cluster	5672	
+igs-cluster	rabbitmq		5672	
+igs-cluster	rabbitmq-cluster	5672	
+
+
+
+igs		iip 			80
+igs		iip-cluster		80
+igs-cluster	iip 			80
+igs-cluster	iip-cluster 		80
+
+igs		nginx			80
+igs		nginx-cluster		80
+igs-cluster	nginx			80
+igs-cluster	nginx-cluster		80
+
+igs		ids			80
+igs		ids-cluster		80
+igs-cluster	ids			80
+igs-cluster	ids-cluster		80
+
+igs 	  	mariadb			3306
+igs   		mariadb_master		3306
+igs   		mariadb_slave		3306
+igs-cluster   	mariadb			3306
+igs-cluster   	mariadb_master		3306
+igs-cluster   	mariadb_master		3306
+
+##ipm
+ipm		mariadb			3306
+ipm		mariadb_master		3306
+ipm		mariadb_slave		3306
+ipm-cluster	mariadb			3306
+ipm-cluster	mariadb_master		3306
+ipm-cluster	mariadb_master		3306
+
+ipm		iip			80
+ipm		iip-cluster		80
+ipm-cluster	iip			80
+ipm-cluster	iip-cluster		80
+
+
+
+ipm		ids			80
+ipm		ids-master		80
+ipm-cluster	ids			80
+ipm-cluster	ids-cluster		80
+
+ipmi		redis			6379
+ipm		redis-cluster		6379
+ipm		redis-slave		6379
+ipm-cluster	redis			6379
+ipm-cluster	redis-master		6379
+ipm-cluster	redis-slave		6379
+
+ipm		rabbitmq		5672
+ipm		rabbitmq-cluster	5672
+ipm-cluster	rabbitmq		5672
+ipm-cluster	rabbitmq-cluster	5672
+
+##nginx
+nginx		ids			8300
+nginx		ids-cluster		8300
+nginx-cluster	ids			8300
+nginx-cluster	ids-cluster		8300
+
+nginx		mas			8080
+nginx		mas-cluster		8080
+nginx-cluster	mas			8080
+nginx-cluster	mas-cluster		8080
+
+nginx		ckm			8000
+nginx		ckm-cluster		8000
+nginx-cluster	ckm			8000
+nginx-cluster	ckm-cluster		8000
+
+nginx 		wechat			8081
+nginx 		wechar-cluster		8081
+nginx-cluster 	wechat			8081
+nginx-cluster 	wechat-cluster		8081
+
+nginx		trsweibo			8070
+nginx		weibo-cluster		8070
+nginx-cluster	trsweibo			8070
+nginx-cluster	weibo-cluster		8070
+
+nginx		iip			8080
+nginx		iip-cluster		8080
+nginx-cluster	iip			8080
+nginx-cluster	iip-cluster		8080
+
+nginx		igi			8082
+nginx		igi-cluster		8082
+nginx-cluster	igi			8082
+nginx-cluster	igi-cluster		8082
+
+nginx		igs			8083
+nginx		igs-cluster		8083
+nginx-cluster	igs			8083
+nginx-cluster	igs-cluster		8083
+
+nginx		ipm			8200
+nginx		ipm-cluster		8200
+nginx-cluster	ipm			8200
+nginx-cluster	ipm-cluster		8200
+
+nginx		rabbitmq		15672
+nginx		rabbitmq-cluster	15672
+nginx-cluster	rabbitmq		15672
+nginx-cluster	rabbitmq		15672

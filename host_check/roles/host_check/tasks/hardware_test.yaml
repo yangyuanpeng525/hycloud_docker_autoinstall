@@ -1,0 +1,80 @@
+- name: "获取当前GROUP 名"
+  run_once: true
+  set_fact:
+      currentGroupName: "{{ hostvars[item].group_names[0] }}"
+  loop: "{{ ansible_play_batch }}"
+- name: "打印组名"
+  run_once: true
+  debug:
+    msg: "当前 group name 是： {{ currentGroupName }}"
+
+- name: "获取内存最低要求"
+  run_once: true
+  set_fact:
+     MinMemSize: "{{ hostvars[groups[currentGroupName][0]].mem }}"
+
+- name: "获取CPU 核心数最低要求"
+  run_once: true
+  set_fact:
+    MinCPUCore: "{{ hostvars[groups[currentGroupName][0]].cpu }}"
+
+
+- name: "获取磁盘大小最低要求"
+  run_once: true
+  set_fact:
+     MinDiskSize: "{{ hostvars[groups[currentGroupName][0]].disk }}"
+
+- name: "获取磁盘最小读写速度"
+  run_once: true
+  set_fact:
+     MinDiskIOSpeed: "{{ hostvars[groups[currentGroupName][0]].io }}"
+
+
+
+- name: "检测实际内存大小"
+  fail:
+     msg: "主机({{ inventory_hostname }})内存大小: {{ hostvars[inventory_hostname].ansible_memtotal_mb }}MB，不满足最少{{ MinMemSize }}MB"
+  when: "hostvars[inventory_hostname].ansible_memtotal_mb|int <  MinMemSize|int"
+
+- name: "检测CPU 核心数"
+  fail:
+     msg: "主机({{ inventory_hostname }})CPU数量: {{ hostvars[inventory_hostname].ansible_processor_vcpus }}，不满足最少{{ MinCPUCore }}"
+  when: "hostvars[inventory_hostname].ansible_processor_vcpus|int <  MinCPUCore|int"
+
+- name: "检测/TRS 目录"
+  shell: "stat /TRS >/dev/null 2>&1 && df -BG /TRS|tail -n 1|awk '{print $4}'|sed  -e 's/G//g'"
+  register: TmpResult
+  ignore_errors: yes
+
+- fail:
+    msg: "/TRS 目录不存在，或者不满足可用空间 {{ MinDiskSize }} GB"
+  when: TmpResult.rc != 0 or TmpResult.stdout|int < MinDiskSize|int
+
+
+- name: "检测/TRS 目录磁盘读写速度"
+  shell: "export LC_ALL='en_US.UTF-8';echo 3 | sudo tee /proc/sys/vm/drop_caches;dd if=/dev/zero  of=/TRS/testIO.tmp  bs=1M  count=500 iflag=fullblock"
+  register: TmpResult
+  ignore_errors: yes
+
+
+- set_fact:
+     TmpList: '{{  TmpResult.stderr_lines[-1].split(" ") }}'
+
+
+- set_fact:
+    RawIONum: "{{ TmpList[-2]|float }}"
+
+
+- set_fact:
+    RawIONum: '{{  TmpList[-2]|float * 1000 }}'
+  when: "'GB' in TmpList[-1]"
+
+
+- fail:
+    msg: "/TRS 目录读写速度过慢，测试速度：{{ TmpResult.stderr_lines[-1] }}, 目标速度: {{ MinDiskIOSpeed }} MB/秒"
+  when: RawIONum|int < MinDiskIOSpeed|int
+
+
+- debug:
+    msg: "{{ inventory_hostname }}  检测完成，符合标准"
+

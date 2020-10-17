@@ -1,0 +1,12 @@
+---
+- name: "采编服务部署"
+  hosts: all:!ungrouped 
+  roles:
+   -  host_check
+   -  hardware_check
+   -  generate_hardware_report
+   -  port_check
+   -  generate_port_report
+   -  end
+
+      
