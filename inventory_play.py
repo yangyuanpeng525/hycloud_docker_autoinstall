@@ -201,7 +201,9 @@ def hy_run():
                         f.write("[elasticsearch]\n")
                         f.write(":".join(SectionDict_elasticsearch["elasticsearch"][0]) + "\n")
                     elif "elasticsearch_cluster" in SectionDict_elasticsearch:
-                        f.write("[elasticsearch_cluster]\n")
+			#iip的logstash默认elasticsearch组
+                        f.write("[elasticsearch]\n")
+#                        f.write("[elasticsearch_cluster]\n")
                         f.write(":".join(SectionDict_elasticsearch["elasticsearch_cluster"][0]) + "\n")
                 yaml_file = "install_" + group + ".yml"
 # 写入nginx组
