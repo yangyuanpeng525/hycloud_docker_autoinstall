@@ -1,5 +1,0 @@
- - name: "SSH 连通性测试"
-   fail:
-     msg:  "严重错误： {{ item }} 主机SSH 无法连接"
-   when: "'ansible_all_ipv4_addresses' not in hostvars[item]"
-   loop: "{{ ansible_play_hosts_all }}"
